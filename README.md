@@ -10,4 +10,4 @@ If your group number is a single digit, i.e 2024-Team1 is fine as well.)
 
 The other members in the team will be able to see an existing team with your team number in the “Join an existing team” section. Click Join.
 
-## Step 3. Step 3. All of you should be able to see the acceptance page. Click on the assignment link to see the project on GitHub.
+## Step 3. All of you should be able to see the acceptance page. Click on the assignment link to see the project on GitHub.
