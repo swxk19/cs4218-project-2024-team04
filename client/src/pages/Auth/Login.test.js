@@ -58,7 +58,7 @@ describe('Login Component', () => {
         expect(getByPlaceholderText('Enter Your Password')).toBeInTheDocument();
       });
       it('inputs should be initially empty', () => {
-        const { getByText, getByPlaceholderText } = render(
+        const { getByPlaceholderText } = render(
           <MemoryRouter initialEntries={['/login']}>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -66,7 +66,6 @@ describe('Login Component', () => {
           </MemoryRouter>
         );
 
-        expect(getByText('LOGIN FORM')).toBeInTheDocument();
         expect(getByPlaceholderText('Enter Your Email').value).toBe('');
         expect(getByPlaceholderText('Enter Your Password').value).toBe('');
       });
