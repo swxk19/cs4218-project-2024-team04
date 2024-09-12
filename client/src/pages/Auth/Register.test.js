@@ -17,10 +17,10 @@ jest.mock('../../context/auth', () => ({
   jest.mock('../../context/cart', () => ({
     useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
   }));
-    
+
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-  }));  
+  }));
 
   Object.defineProperty(window, 'localStorage', {
     value: {
@@ -38,12 +38,32 @@ window.matchMedia = window.matchMedia || function() {
       removeListener: function() {}
     };
   };
-      
+
 
 describe('Register Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  it('renders register form', ()=> {
+    const { getByText, getByPlaceholderText } = render(
+      <MemoryRouter initialEntries={['/login']}>
+          <Routes>
+              <Route path="/register" element={<Register />} />
+          </Routes>
+      </MemoryRouter>
+    )
+
+    expect(getByText('REGISTER FORM')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter Your Name')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter Your Email')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter Your Password')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter Your Phone')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter Your Address')).toBeInTheDocument()
+    expect(getByPlaceholderText('Enter Your DOB')).toBeInTheDocument()
+    expect(getByPlaceholderText('What is Your Favorite sports')).toBeInTheDocument()
+  })
 
   it('should register the user successfully', async () => {
     axios.post.mockResolvedValueOnce({ data: { success: true } });
