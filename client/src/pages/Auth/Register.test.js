@@ -62,10 +62,12 @@ describe('Register Component', () => {
     expect(getByPlaceholderText('Enter Your Address')).toBeInTheDocument()
     expect(getByPlaceholderText('Enter Your DOB')).toBeInTheDocument()
     expect(getByPlaceholderText('What is Your Favorite sports')).toBeInTheDocument()
+
+
   })
 
   it('inputs should be initially empty', () => {
-    const { getByText, getByPlaceholderText } = render(
+    const { getByPlaceholderText } = render(
       <MemoryRouter initialEntries={['/register']}>
           <Routes>
               <Route path="/register" element={<Register />} />
@@ -80,6 +82,32 @@ describe('Register Component', () => {
     expect(getByPlaceholderText('Enter Your Address').value).toBe('')
     expect(getByPlaceholderText('Enter Your DOB').value).toBe('')
     expect(getByPlaceholderText('What is Your Favorite sports').value).toBe('')
+  })
+
+  it('should allow inputs into input fields', () => {
+    const { getByPlaceholderText } = render(
+      <MemoryRouter initialEntries={['/register']}>
+          <Routes>
+              <Route path="/register" element={<Register />} />
+          </Routes>
+      </MemoryRouter>
+    )
+
+    fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: {value: 'test name' } })
+    fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: {value: 'test_email@email.com' } })
+    fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: {value: 'password!1' } })
+    fireEvent.change(getByPlaceholderText('Enter Your Phone'), { target: {value: '12345678' } })
+    fireEvent.change(getByPlaceholderText('Enter Your Address'), { target: {value: 'Sentosa #1' } })
+    fireEvent.change(getByPlaceholderText('Enter Your DOB'), { target: {value: '1999-11-19' } })
+    fireEvent.change(getByPlaceholderText('What is Your Favorite sports'), { target: {value: 'Badminton' } })
+
+    expect(getByPlaceholderText('Enter Your Name').value).toBe('test name')
+    expect(getByPlaceholderText('Enter Your Email').value).toBe('test_email@email.com')
+    expect(getByPlaceholderText('Enter Your Password').value).toBe('password!1')
+    expect(getByPlaceholderText('Enter Your Phone').value).toBe('12345678')
+    expect(getByPlaceholderText('Enter Your Address').value).toBe('Sentosa #1')
+    expect(getByPlaceholderText('Enter Your DOB').value).toBe('1999-11-19')
+    expect(getByPlaceholderText('What is Your Favorite sports').value).toBe('Badminton')
   })
 
   it('should register the user successfully', async () => {
