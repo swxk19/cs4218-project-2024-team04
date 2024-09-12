@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import '@testing-library/jest-dom/extend-expect';
@@ -17,10 +17,10 @@ jest.mock('../../context/auth', () => ({
   jest.mock('../../context/cart', () => ({
     useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
   }));
-    
+
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-  }));  
+  }));
 
   Object.defineProperty(window, 'localStorage', {
     value: {
@@ -37,7 +37,7 @@ window.matchMedia = window.matchMedia || function() {
       addListener: function() {},
       removeListener: function() {}
     };
-  };  
+  };
 
 describe('Login Component', () => {
     beforeEach(() => {
@@ -52,7 +52,7 @@ describe('Login Component', () => {
             </Routes>
           </MemoryRouter>
         );
-    
+
         expect(getByText('LOGIN FORM')).toBeInTheDocument();
         expect(getByPlaceholderText('Enter Your Email')).toBeInTheDocument();
         expect(getByPlaceholderText('Enter Your Password')).toBeInTheDocument();
@@ -65,14 +65,14 @@ describe('Login Component', () => {
             </Routes>
           </MemoryRouter>
         );
-    
+
         expect(getByText('LOGIN FORM')).toBeInTheDocument();
         expect(getByPlaceholderText('Enter Your Email').value).toBe('');
         expect(getByPlaceholderText('Enter Your Password').value).toBe('');
       });
-    
+
       it('should allow typing email and password', () => {
-        const { getByText, getByPlaceholderText } = render(
+        const { getByPlaceholderText } = render(
           <MemoryRouter initialEntries={['/login']}>
             <Routes>
               <Route path="/login" element={<Login />} />
@@ -84,7 +84,7 @@ describe('Login Component', () => {
         expect(getByPlaceholderText('Enter Your Email').value).toBe('test@example.com');
         expect(getByPlaceholderText('Enter Your Password').value).toBe('password123');
       });
-      
+
     it('should login the user successfully', async () => {
         axios.post.mockResolvedValueOnce({
             data: {
@@ -135,4 +135,17 @@ describe('Login Component', () => {
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith('Something went wrong');
     });
+
+    it('navigates to Account Recovery page when Forgot Password button is clicked', async () => {
+      const { getByText } = render(
+        <MemoryRouter initialEntries={['/login']}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      fireEvent.click(getByText('Forgot Password'));
+      expect(screen.getByText('Account Recovery')).toBeInTheDocument()
+    })
 });
