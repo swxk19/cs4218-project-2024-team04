@@ -21,9 +21,9 @@ describe('User Menu Component', () => {
 
     it('navigate to profile', () => {
         const { getByText } = render(
-            <MemoryRouter initialEntries={['/dashboard/user']}>
+            <MemoryRouter initialEntries={['/usermenu']}>
                 <Routes>
-                    <Route path="/dashboard/user" element={<UserMenu />} />
+                    <Route path="/usermenu" element={<UserMenu />} />
                     <Route path="/dashboard/user/profile" element={<Profile />} />
                 </Routes>
             </MemoryRouter>
@@ -35,9 +35,9 @@ describe('User Menu Component', () => {
 
     it('navigate to orders', () => {
         const { getByText } = render(
-            <MemoryRouter initialEntries={['/dashboard/user']}>
+            <MemoryRouter initialEntries={['/usermenu']}>
                 <Routes>
-                    <Route path="/dashboard/user" element={<UserMenu />} />
+                    <Route path="/usermenu" element={<UserMenu />} />
                     <Route path="/dashboard/user/orders" element={<Orders />} />
                 </Routes>
             </MemoryRouter>
