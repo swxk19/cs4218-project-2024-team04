@@ -179,7 +179,7 @@ describe('Profile Component', () => {
 
         fireEvent.click(getByText('UPDATE'));
 
-        await waitFor(() => expect(axios.put).toHaveBeenCalled())
+        await waitFor(() => expect(axios.put).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith("Something went wrong");
     });
 
