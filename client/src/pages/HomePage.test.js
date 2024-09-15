@@ -1,6 +1,9 @@
 import React from "react";
 import axios from "axios";
 import { jest } from "@jest/globals";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import "@testing-library/jest-dom";
 import {
   getAllCategory,
   getAllProducts,
@@ -8,6 +11,41 @@ import {
   handleFilter,
 } from "./HomePage.test.utils";
 import e from "express";
+import HomePage from "./HomePage";
+
+jest.mock("axios");
+jest.mock("react-hot-toast");
+
+jest.mock("../context/auth", () => ({
+  useAuth: jest.fn(() => [null, jest.fn()]), // Mock useAuth hook to return null state and a mock function for setAuth
+}));
+
+jest.mock("../context/cart", () => ({
+  useCart: jest.fn(() => [null, jest.fn()]), // Mock useCart hook to return null state and a mock function
+}));
+
+jest.mock("../context/search", () => ({
+  useSearch: jest.fn(() => [{ keyword: "" }, jest.fn()]), // Mock useSearch hook to return null state and a mock function
+}));
+
+Object.defineProperty(window, "localStorage", {
+  value: {
+    setItem: jest.fn(),
+    getItem: jest.fn(),
+    removeItem: jest.fn(),
+  },
+  writable: true,
+});
+
+window.matchMedia =
+  window.matchMedia ||
+  function () {
+    return {
+      matches: false,
+      addListener: function () {},
+      removeListener: function () {},
+    };
+  };
 
 jest.mock("./HomePage.test.utils", () => {
   const originalModule = jest.requireActual("./HomePage.test.utils");
@@ -69,5 +107,47 @@ describe("HomePage Component", () => {
 
     expect(setChecked).toHaveBeenCalledTimes(1);
     expect(setChecked).toHaveBeenCalledWith([1, 2, 3, 4]);
+  });
+
+  it("renders price filters correctly", () => {
+    const { getByText, getByDisplayValue } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    expect(getByText("$0 to 19")).toBeInTheDocument();
+    expect(getByText("$20 to 39")).toBeInTheDocument();
+    expect(getByText("$40 to 59")).toBeInTheDocument();
+    expect(getByText("$60 to 79")).toBeInTheDocument();
+    expect(getByText("$80 to 99")).toBeInTheDocument();
+    expect(getByText("$100 or more")).toBeInTheDocument();
+  });
+
+  it("checks the filter when it's clicked", () => {
+    const { getByText, getByDisplayValue } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    fireEvent.click(getByText("$0 to 19"));
+    expect(getByDisplayValue("0,19")).toBeChecked();
+  });
+
+  it("shows all categories when category tab is clicked", () => {
+    const { getByText } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    screen.getAllByText("Categories").forEach((element) => {
+      expect(element).toBeVisible();
+    });
   });
 });
