@@ -50,7 +50,7 @@
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom",
-    "testPathIgnorePatterns": ["/_site"],
+    "testPathIgnorePatterns": ["/_site", "/tests-examples"],
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     },
