@@ -14,6 +14,6 @@ The other members in the team will be able to see an existing team with your tea
 
 # Milestone Submission Instructions
 In the repository of your team, tag the submitted commit with a tag name “ms1” (meaning milestone 1). 
-o Create a tag, e.g., git tag -a ms1 -m “Milestone 1”
-o Push the created tag into the repository, e.g., git push origin ms1
-o More details are in: http://git-scm.com/book/en/v2/Git-Basics-Tagging
+1. Create a tag, e.g., git tag -a ms1 -m “Milestone 1”
+2. Push the created tag into the repository, e.g., git push origin ms1
+3. More details are in: http://git-scm.com/book/en/v2/Git-Basics-Tagging
