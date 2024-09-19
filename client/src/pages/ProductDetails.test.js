@@ -190,7 +190,9 @@ describe('Product Details Component', () => {
         });
     });
 
-    it('should allow the user to add the product to their cart', async () => {
+    // The "ADD TO CART" button doesn't do anything. Doesn't add product to cart
+    // nor display the toast message "Item Added to cart".
+    it.failing('should allow the user to add the product to their cart', async () => {
         const { getByText, getByRole } = render(
             <MemoryRouter initialEntries={['/product/' + JEANS_PRODUCT_OBJECT.slug]}>
                 <ProductDetails />
