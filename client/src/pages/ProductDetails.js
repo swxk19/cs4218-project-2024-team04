@@ -12,15 +12,19 @@ const ProductDetails = () => {
 
   //initalp details
   useEffect(() => {
+    // console.log("I am here in useEffect()");
     if (params?.slug) getProduct();
   }, [params?.slug]);
   //getProduct
   const getProduct = async () => {
     try {
+      // console.log("I am here in getProduct() before API call");
       const { data } = await axios.get(
         `/api/v1/product/get-product/${params.slug}`
       );
+      // console.log(data?.product);
       setProduct(data?.product);
+      // console.log("I am here in getProduct() after API call");
       getSimilarProduct(data?.product._id, data?.product.category._id);
     } catch (error) {
       console.log(error);
@@ -32,6 +36,8 @@ const ProductDetails = () => {
       const { data } = await axios.get(
         `/api/v1/product/related-product/${pid}/${cid}`
       );
+      // console.log(data?.products);
+      // console.log("I am here in getSimilarProduct()");
       setRelatedProducts(data?.products);
     } catch (error) {
       console.log(error);
