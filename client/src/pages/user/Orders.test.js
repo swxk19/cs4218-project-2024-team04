@@ -183,6 +183,6 @@ describe('Orders Component', () => {
         await waitFor(() => {
             expect(console.log).toHaveBeenCalledWith(new Error('Mock Error'));
         });
-    })
+    });
 
 });
