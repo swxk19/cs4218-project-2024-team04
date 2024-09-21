@@ -13,8 +13,8 @@ const AdminOrders = () => {
     "Not Process",
     "Processing",
     "Shipped",
-    "deliverd",
-    "cancel",
+    "Delivered",
+    "Cancel",
   ]);
   const [changeStatus, setCHangeStatus] = useState("");
   const [orders, setOrders] = useState([]);

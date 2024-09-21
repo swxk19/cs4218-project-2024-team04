@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/extend-expect'
 import AdminOrders from './AdminOrders';
 import axios from "axios";
 import moment from "moment";
+import userEvent from "@testing-library/user-event";
 
 jest.mock('axios')
 jest.mock('react-hot-toast')
@@ -186,5 +187,158 @@ describe('Admin Orders Component', () => {
         });
     });
 
-    // TODO: Add test for changing order status
+    it('check if all status is available in dropdown selection', async () => {
+        axios.get.mockResolvedValue({
+            data: [
+                {
+                    _id: '1',
+                    products: [
+                        {
+                            _id: '1',
+                            name: 'Shoes',
+                            description: 'Classic shoes',
+                            price: 99.99,
+                        },
+                    ],
+                    payment: {
+                        success: false,
+                    },
+                    buyer: {
+                        name: 'John Doe',
+                    },
+                    status: 'Mock Status',
+                    createdAt: '2024-09-14T08:26:06.070Z',
+                },
+            ],
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/admin/orders']}>
+                <Routes>
+                    <Route path="/admin/orders" element={<AdminOrders />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
+
+        await waitFor(() => {
+            const select = screen.getByRole('combobox');
+            userEvent.click(select);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTitle('Not Process')).toBeInTheDocument();
+            expect(screen.getByTitle('Shipped')).toBeInTheDocument();
+            expect(screen.getByTitle('Processing')).toBeInTheDocument();
+            expect(screen.getByTitle('Delivered')).toBeInTheDocument();
+            expect(screen.getByTitle('Cancel')).toBeInTheDocument();
+        });
+    });
+
+    it('changes order status', async () => {
+        axios.get.mockResolvedValue({
+            data: [
+                {
+                    _id: '1',
+                    products: [
+                        {
+                            _id: '1',
+                            name: 'Shoes',
+                            description: 'Classic shoes',
+                            price: 99.99,
+                        },
+                    ],
+                    payment: {
+                        success: false,
+                    },
+                    buyer: {
+                        name: 'John Doe',
+                    },
+                    status: 'Mock Status',
+                    createdAt: '2024-09-14T08:26:06.070Z',
+                },
+            ],
+        });
+
+        axios.put.mockResolvedValue({
+            data: {
+                status: 'New Status',
+            },
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/admin/orders']}>
+                <Routes>
+                    <Route path="/admin/orders" element={<AdminOrders />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
+
+        await waitFor(() => {
+            const select = screen.getByRole('combobox');
+            userEvent.click(select);
+        });
+
+        await waitFor(() => {
+            userEvent.click(screen.getByTitle('Shipped'));
+        });
+
+        expect(axios.put).toHaveBeenCalledWith('/api/v1/auth/order-status/1', {
+            status: 'Shipped',
+        });
+
+        expect(axios.get).toHaveBeenCalledTimes(2);
+    });
+
+    it('console logs failed update of order status', async () => {
+        axios.get.mockResolvedValue({
+            data: [
+                {
+                    _id: '1',
+                    products: [
+                        {
+                            _id: '1',
+                            name: 'Shoes',
+                            description: 'Classic shoes',
+                            price: 99.99,
+                        },
+                    ],
+                    payment: {
+                        success: false,
+                    },
+                    buyer: {
+                        name: 'John Doe',
+                    },
+                    status: 'Mock Status',
+                    createdAt: '2024-09-14T08:26:06.070Z',
+                },
+            ],
+        });
+
+        axios.put.mockRejectedValue(new Error('Mock Error'));
+
+        render(
+            <MemoryRouter initialEntries={['/admin/orders']}>
+                <Routes>
+                    <Route path="/admin/orders" element={<AdminOrders />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
+
+        await waitFor(() => {
+            const select = screen.getByRole('combobox');
+            userEvent.click(select);
+        });
+
+        await waitFor(() => {
+            userEvent.click(screen.getByTitle('Shipped'));
+        });
+
+        expect(console.log).toHaveBeenCalledWith(new Error('Mock Error'));
+    });
 });
