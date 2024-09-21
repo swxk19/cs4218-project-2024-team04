@@ -11,7 +11,6 @@ import { useAuth } from "../../context/auth";
 jest.mock('axios')
 jest.mock('react-hot-toast')
 
-
 jest.mock('../../context/auth', () => ({
     useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
 }));
@@ -23,6 +22,11 @@ jest.mock('../../context/cart', () => ({
 jest.mock('../../context/search', () => ({
     useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
 }))
+
+jest.mock('../../hooks/useCategory', () => ({
+    __esModule: true,
+    default: jest.fn(() => [])
+}));
 
 Object.defineProperty(window, 'localStorage', {
     value: {
@@ -44,6 +48,7 @@ window.matchMedia = window.matchMedia || function() {
 describe('Profile Component', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        jest.spyOn(global.console, 'log').mockImplementation(() => {});
         useAuth.mockReturnValue([{
             user: {
                 name: 'John Doe',
@@ -70,6 +75,9 @@ describe('Profile Component', () => {
         })
     })
 
+    afterEach(() => {
+        console.log.mockRestore();
+    });
 
 
     it('renders register form', () => {
@@ -156,13 +164,9 @@ describe('Profile Component', () => {
     });
 
     it('should show error message if update fails', async () => {
-        axios.put.mockRejectedValueOnce({
-            response: {
-                data: {
-                    error: 'Error Message'
-                }
-            }
-        });
+        axios.put.mockRejectedValueOnce(
+            new Error('Mock Error')
+        );
 
         const { getByPlaceholderText, getByText } = render(
             <MemoryRouter initialEntries={['/user/profile']}>
@@ -181,6 +185,7 @@ describe('Profile Component', () => {
 
         await waitFor(() => expect(axios.put).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith("Something went wrong");
+        expect(console.log).toHaveBeenCalledWith(new Error('Mock Error'));
     });
 
     it('should show error message if axios is successful, but internally there is an error', async () => {
