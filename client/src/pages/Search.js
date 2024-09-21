@@ -14,6 +14,7 @@ const Search = () => {
               : `Found ${values?.results.length}`}
           </h6>
           <div className="d-flex flex-wrap mt-4">
+          {console.log(values.results)}
             {values?.results.map((p) => (
               <div className="card m-2" style={{ width: "18rem" }}>
                 <img
