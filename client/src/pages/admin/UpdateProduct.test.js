@@ -209,7 +209,7 @@ describe('UpdateProduct Component', () => {
         })
 
         expect(axios.delete).toHaveBeenCalled()
-        expect(toast.success).toHaveBeenCalledWith('Product DEleted Succfully')
+        expect(toast.success).toHaveBeenCalledWith('Product Deleted Successfully')
         expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products')
     })
 

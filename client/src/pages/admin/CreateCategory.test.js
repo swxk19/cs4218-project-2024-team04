@@ -114,7 +114,7 @@ describe('CreateCategory Component', () => {
         fireEvent.click(screen.getByText('Submit'))
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('somthing went wrong in input form')
+            expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
         })
     })
 
@@ -155,7 +155,7 @@ describe('CreateCategory Component', () => {
         )
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting catgeory')
+            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
         })
     })
 
@@ -176,7 +176,7 @@ describe('CreateCategory Component', () => {
         )
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting catgeory')
+            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
         })
     })
 
