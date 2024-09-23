@@ -204,9 +204,13 @@ describe('UpdateProduct Component', () => {
         })
     })
 
-    // Displays misspelled toast message "Product DEleted Succfully".
+    // Displays misspelled toast message "Product DEleted Succfully", and it
+    // isn't the message returned by the backend.
     it.failing('calls delete API when "DELETE PRODUCT" button is clicked and confirmed', async () => {
-        axios.delete.mockResolvedValueOnce({ data: { success: true } })
+        const UPDATE_SUCCESS_MESSAGE = 'SUCCESS MESSAGE'
+        axios.delete.mockResolvedValueOnce({
+            data: { success: true, message: UPDATE_SUCCESS_MESSAGE },
+        })
         window.prompt = jest.fn(() => 'yes')
 
         render(
@@ -222,7 +226,7 @@ describe('UpdateProduct Component', () => {
         })
 
         expect(axios.delete).toHaveBeenCalled()
-        expect(toast.success).toHaveBeenCalledWith('Product Deleted Successfully')
+        expect(toast.success).toHaveBeenCalledWith(UPDATE_SUCCESS_MESSAGE)
         expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products')
     })
 
