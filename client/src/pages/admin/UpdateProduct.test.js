@@ -166,6 +166,8 @@ describe('UpdateProduct Component', () => {
     })
 
     // UI crashes with runtime error when user submits invalid product values (eg. empty price)
+    // Edit: Fixed runtime error but UI displays a toast message "something went
+    // wrong" which is not the error message returned by the backend.
     it.failing('displays error message when product update fails', async () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.put.mockRejectedValueOnce({

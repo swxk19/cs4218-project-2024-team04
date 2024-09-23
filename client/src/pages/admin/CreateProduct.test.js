@@ -138,7 +138,7 @@ describe('CreateProduct Component', () => {
 
     // UI crashes on erroneous inputs:
     // https://github.com/cs4218/cs4218-project-2024-team04/issues/13
-    // Even when it doesn't crash, it will display a toast message "something
+    // Edit: Fixed runtime error but UI displays a toast message "something
     // went wrong" which is not the error message returned by the backend.
     it.failing('displays error message when submitting empty form', async () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
