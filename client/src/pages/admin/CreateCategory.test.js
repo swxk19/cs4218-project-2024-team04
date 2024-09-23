@@ -353,7 +353,10 @@ describe('CreateCategory Component', () => {
         axios.post.mockRejectedValueOnce({
             response: {
                 status: 400,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 
@@ -389,7 +392,10 @@ describe('CreateCategory Component', () => {
         axios.post.mockRejectedValueOnce({
             response: {
                 status: 400,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 
@@ -423,7 +429,10 @@ describe('CreateCategory Component', () => {
         axios.post.mockRejectedValueOnce({
             response: {
                 status: 400,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 

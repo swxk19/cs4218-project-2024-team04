@@ -171,7 +171,10 @@ describe('UpdateProduct Component', () => {
         axios.put.mockRejectedValueOnce({
             response: {
                 status: 400,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 
