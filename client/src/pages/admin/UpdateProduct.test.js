@@ -170,7 +170,7 @@ describe('UpdateProduct Component', () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.put.mockRejectedValueOnce({
             response: {
-                status: 401,
+                status: 400,
                 data: { message: BACKEND_ERROR_MESSAGE },
             },
         })
