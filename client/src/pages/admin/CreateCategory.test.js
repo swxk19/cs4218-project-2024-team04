@@ -352,8 +352,11 @@ describe('CreateCategory Component', () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.post.mockRejectedValueOnce({
             response: {
-                status: 401,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                status: 400,
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 
@@ -388,8 +391,11 @@ describe('CreateCategory Component', () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.post.mockRejectedValueOnce({
             response: {
-                status: 401,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                status: 400,
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 
@@ -422,8 +428,11 @@ describe('CreateCategory Component', () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.post.mockRejectedValueOnce({
             response: {
-                status: 401,
-                data: { message: BACKEND_ERROR_MESSAGE },
+                status: 400,
+                data: {
+                    success: false,
+                    message: BACKEND_ERROR_MESSAGE,
+                },
             },
         })
 
