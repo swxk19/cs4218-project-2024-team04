@@ -113,7 +113,7 @@ describe('Search Component', () => {
     });
 
     // THIS SHOULD FAIL, THE MORE DETAILS BUTTON CURRENTLY DOESNT WORK
-    it('should navigate to the product details page when a user clicks on the "More Details" button', async () => {
+    it.failing('should navigate to the product details page when a user clicks on the "More Details" button', async () => {
         useSearch.mockReturnValue([{
             results: SEARCH_VALID_PRODUCT_SINGLE_RESULT,
             keyword: SEARCH_VALID_PRODUCT_NAME
@@ -133,7 +133,7 @@ describe('Search Component', () => {
     });
 
     // THIS SHOULD ALSO FAIL, THE ADD TO CART BUTTON CURRENTLY ALSO DOESNT WORK
-    it('should add the product to the cart when a user clicks on the "ADD TO CART" button', async () => {
+    it.failing('should add the product to the cart when a user clicks on the "ADD TO CART" button', async () => {
         useSearch.mockReturnValue([{
             results: SEARCH_VALID_PRODUCT_SINGLE_RESULT,
             keyword: SEARCH_VALID_PRODUCT_NAME

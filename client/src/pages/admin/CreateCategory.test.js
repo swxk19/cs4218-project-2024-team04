@@ -98,7 +98,7 @@ describe('CreateCategory Component', () => {
     })
 
     // Displays misspelled toast message "somthing went wrong in input form".
-    it.skip('displays error toast when category creation fails', async () => {
+    it.failing('displays error toast when category creation fails', async () => {
         axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
         axios.post.mockRejectedValueOnce(new Error('Creation failed'))
 
@@ -141,7 +141,7 @@ describe('CreateCategory Component', () => {
     })
 
     // Displays misspelled toast message "Something wwent wrong in getting catgeory".
-    it.skip('handles error when fetching categories fails due to unreachable server', async () => {
+    it.failing('handles error when fetching categories fails due to unreachable server', async () => {
         axios.get.mockRejectedValueOnce({
             isAxiosError: true,
             code: 'ECONNABORTED',
@@ -162,7 +162,7 @@ describe('CreateCategory Component', () => {
     })
 
     // Displays misspelled toast message "Something wwent wrong in getting catgeory".
-    it.skip('handles error when fetching categories fails due to 500 Internal Server Error', async () => {
+    it.failing('handles error when fetching categories fails due to 500 Internal Server Error', async () => {
         axios.get.mockRejectedValueOnce({
             response: {
                 status: 500,
@@ -342,7 +342,7 @@ describe('CreateCategory Component', () => {
 
     // Displays a toast message "somthing went wrong in input form" which is
     // both misspelled, and also not the error message returned by the backend.
-    it.skip('shows error when trying to create category with empty name', async () => {
+    it.failing('shows error when trying to create category with empty name', async () => {
         const mockCategories = [
             { _id: '1', name: 'Category 1' },
             { _id: '2', name: 'Category 2' },
@@ -381,7 +381,7 @@ describe('CreateCategory Component', () => {
 
     // Displays the toast message "somthing went wrong in input form" which is
     // both misspelled, and also not the error message returned by the backend.
-    it.skip('shows error when creating category with existing name', async () => {
+    it.failing('shows error when creating category with existing name', async () => {
         const mockCategories = [
             { _id: '1', name: 'Category 1' },
             { _id: '2', name: 'Category 2' },
@@ -418,7 +418,7 @@ describe('CreateCategory Component', () => {
 
     // Displays the toast message "Somtihing went wrong" which is both
     // misspelled, and also not the error message returned by the backend.
-    it.skip('shows error when editing category to an existing name', async () => {
+    it.failing('shows error when editing category to an existing name', async () => {
         const mockCategories = [
             { _id: '1', name: 'Category 1' },
             { _id: '2', name: 'Category 2' },

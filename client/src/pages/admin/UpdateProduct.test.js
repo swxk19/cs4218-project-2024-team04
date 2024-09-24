@@ -145,8 +145,15 @@ describe('UpdateProduct Component', () => {
         })
     })
 
-    it('calls update API when "UPDATE PRODUCT" button is clicked', async () => {
-        axios.put.mockResolvedValueOnce({ data: { success: true } })
+    // Displays a correctly spelled toast message "Product Updated Successfully"
+    // but its a `toast.error` rather than `toast.success`; and it isn't the
+    // message returned by the backend.
+    // https://github.com/cs4218/cs4218-project-2024-team04/issues/15
+    it.failing('calls update API when "UPDATE PRODUCT" button is clicked', async () => {
+        const UPDATE_SUCCESS_MESSAGE = 'SUCCESS MESSAGE'
+        axios.put.mockResolvedValueOnce({
+            data: { success: true, message: UPDATE_SUCCESS_MESSAGE },
+        })
 
         render(
             <MemoryRouter>
@@ -161,12 +168,14 @@ describe('UpdateProduct Component', () => {
         })
 
         expect(axios.put).toHaveBeenCalled()
-        expect(toast.success).toHaveBeenCalledWith('Product Updated Successfully')
+        expect(toast.success).toHaveBeenCalledWith(UPDATE_SUCCESS_MESSAGE)
         expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products')
     })
 
     // UI crashes with runtime error when user submits invalid product values (eg. empty price)
-    it.skip('displays error message when product update fails', async () => {
+    // Edit: Fixed runtime error but UI displays a toast message "something went
+    // wrong" which is not the error message returned by the backend.
+    it.failing('displays error message when product update fails', async () => {
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.put.mockRejectedValueOnce({
             response: {
@@ -195,9 +204,13 @@ describe('UpdateProduct Component', () => {
         })
     })
 
-    // Displays misspelled toast message "Product DEleted Succfully".
-    it.skip('calls delete API when "DELETE PRODUCT" button is clicked and confirmed', async () => {
-        axios.delete.mockResolvedValueOnce({ data: { success: true } })
+    // Displays misspelled toast message "Product DEleted Succfully", and it
+    // isn't the message returned by the backend.
+    it.failing('calls delete API when "DELETE PRODUCT" button is clicked and confirmed', async () => {
+        const UPDATE_SUCCESS_MESSAGE = 'SUCCESS MESSAGE'
+        axios.delete.mockResolvedValueOnce({
+            data: { success: true, message: UPDATE_SUCCESS_MESSAGE },
+        })
         window.prompt = jest.fn(() => 'yes')
 
         render(
@@ -213,7 +226,7 @@ describe('UpdateProduct Component', () => {
         })
 
         expect(axios.delete).toHaveBeenCalled()
-        expect(toast.success).toHaveBeenCalledWith('Product Deleted Successfully')
+        expect(toast.success).toHaveBeenCalledWith(UPDATE_SUCCESS_MESSAGE)
         expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products')
     })
 
