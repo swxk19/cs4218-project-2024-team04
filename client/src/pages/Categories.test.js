@@ -9,6 +9,7 @@ import {
   findAllByAltText,
   findAllByText,
   findAllByDisplayValue,
+  findByText,
 } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Categories from "./Categories";
@@ -45,24 +46,7 @@ window.matchMedia =
     };
   };
 
-jest.mock("./Categories.test.utils", () => {
-  const originalModule = jest.requireActual("./Categories.test.utils");
-
-  return {
-    __esModule: true,
-    ...originalModule,
-  };
-});
-
 jest.mock("axios");
-
-const getCategories = jest.fn(() => {});
-
-// jest.mock("../hooks/useCategory", () => ({
-//   useCategory: () => ["Electronics", "Books", "Clothing"],
-//   //   jest.fn(() => ["Electronics", "Books", "Clothing"]
-//   // ), // Mock useCart hook to return null state and a mock function
-// }));
 
 jest.mock("../hooks/useCategory", () => ({
   __esModule: true,
@@ -85,5 +69,24 @@ describe("Categories Component", () => {
     expect(await findAllByText("Electronics")).toHaveLength(2);
     expect(await findAllByText("Books")).toHaveLength(2);
     expect(await findAllByText("Clothing")).toHaveLength(2);
+  });
+
+  it("should link each category to their page", async () => {
+    const { findAllByText } = render(
+      <MemoryRouter initialEntries={["/categories"]}>
+        <Routes>
+          <Route path="/categories" element={<Categories />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    expect((await findAllByText("Electronics"))[0].href).toBe(
+      "http://localhost/category/electronics"
+    );
+    expect((await findAllByText("Books"))[0].href).toBe(
+      "http://localhost/category/books"
+    );
+    expect((await findAllByText("Clothing"))[0].href).toBe(
+      "http://localhost/category/clothing"
+    );
   });
 });
