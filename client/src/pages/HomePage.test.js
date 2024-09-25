@@ -83,6 +83,15 @@ describe("HomePage Component", () => {
     expect(setCategories).toHaveBeenCalledWith([]);
   });
 
+  it("should catch error encountered during fetching all categories", async () => {
+    axios.get.mockRejectedValueOnce("categories error");
+    const setCategories = jest.fn();
+    const logSpy = jest.spyOn(console, "log");
+    await getAllCategory(setCategories);
+    expect(logSpy).toHaveBeenCalledWith("categories error");
+    expect(setCategories).toHaveBeenCalledTimes(0);
+  });
+
   it("should get all products", async () => {
     const setProducts = jest.fn();
     const setLoading = jest.fn();
@@ -92,6 +101,22 @@ describe("HomePage Component", () => {
 
     expect(setProducts).toHaveBeenCalledTimes(1);
     expect(setProducts).toHaveBeenCalledWith([]);
+    expect(setLoading).toHaveBeenCalledTimes(2);
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(setLoading).toHaveBeenCalledWith(false);
+  });
+
+  it("should catch error encountered during fetching all products", async () => {
+    axios.get.mockRejectedValueOnce("product error");
+    const setProducts = jest.fn();
+    const setLoading = jest.fn();
+    const logSpy = jest.spyOn(console, "log");
+    await getAllProducts(setProducts, setLoading, "");
+    expect(logSpy).toHaveBeenCalledWith("product error");
+    expect(setLoading).toHaveBeenCalledTimes(2);
+    expect(setLoading).toHaveBeenCalledWith(true);
+    expect(setLoading).toHaveBeenCalledWith(false);
+    expect(setProducts).toHaveBeenCalledTimes(0);
   });
 
   it("should get total count", async () => {
@@ -102,6 +127,15 @@ describe("HomePage Component", () => {
 
     expect(setTotal).toHaveBeenCalledTimes(1);
     expect(setTotal).toHaveBeenCalledWith(1);
+  });
+
+  it("should catch error encountered during fetching total count", async () => {
+    axios.get.mockRejectedValueOnce("total error");
+    const setTotal = jest.fn();
+    const logSpy = jest.spyOn(console, "log");
+    await getTotal(setTotal);
+    expect(logSpy).toHaveBeenCalledWith("total error");
+    expect(setTotal).toHaveBeenCalledTimes(0);
   });
 
   it("should remove filter", () => {
