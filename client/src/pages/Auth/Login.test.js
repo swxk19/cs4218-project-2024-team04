@@ -124,8 +124,6 @@ describe('Login Component', () => {
             fireEvent.click(loginButton);
 
             expect(emailInput).toBeInvalid()
-            // Error message depends on browser, due to different implementations of HTML-5 forms
-            // expect(emailInput.validationMessage).toBe("Please fill out this field.")
           })
 
           it('should show an error if user enters an email without "@"', () => {
@@ -143,8 +141,6 @@ describe('Login Component', () => {
             fireEvent.click(loginButton);
 
             expect(emailInput).toBeInvalid()
-            // Error message depends on browser, due to different implementations of HTML-5 forms
-            // expect(emailInput.validationMessage).toBe("Please include an '@' in the email address. 'invalid email' is missing an '@'.")
           })
 
           it('should show an error if user enters email with "@" but without a domain', () => {
@@ -162,8 +158,6 @@ describe('Login Component', () => {
             fireEvent.click(loginButton);
 
             expect(emailInput).toBeInvalid()
-            // Error message depends on browser, due to different implementations of HTML-5 forms
-            // expect(emailInput.validationMessage).toBe("Please enter a part following '@'. 'invalid email@' is incomplete.")
           })
 
           it.failing('should show an error if user enters email without top-level domain', () => {
@@ -181,8 +175,6 @@ describe('Login Component', () => {
             fireEvent.click(loginButton);
 
             expect(emailInput).toBeInvalid()
-            // Error message depends on browser, due to different implementations of HTML-5 forms
-            // expect(emailInput.validationMessage).toBe("Please include a top-level domain (eg. '.com') in the email address.")
           })
         })
 
