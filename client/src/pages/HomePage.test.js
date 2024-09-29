@@ -185,56 +185,40 @@ describe("HomePage Component", () => {
     expect(getByDisplayValue("0,19")).toBeChecked();
   });
 
-  //   const mockFn = jest.fn({
-  //     data: {
-  //       category: [
-  //         { _id: 1, name: "Electronics" },
-  //         { _id: 2, name: "Book" },
-  //         { _id: 3, name: "Clothing" },
-  //       ],
-  //     },
-  //   });
+  const mockFn = jest.fn({
+    data: {
+      category: [
+        { _id: 1, name: "Electronics" },
+        { _id: 2, name: "Book" },
+        { _id: 3, name: "Clothing" },
+      ],
+    },
+  });
 
-  //   it("renders category filters correctly", () => {
-  //     axios.get.mockImplementation(
-  //       //     (url) => {
-  //       //   switch (url) {
-  //       //     case "http://localhost:3000/api/v1/category/get-category":
-  //       //       return {
-  //       mockFn
-  //       //   };
-  //       //   }
-  //     );
+  it("renders category filters correctly", () => {
+    axios.get.mockImplementation(
+      (url) => {
+        switch (url) {
+          case "http://localhost:3000/api/v1/category/get-category":
+            return mockFn();
+        }
+      }
+      //   }
+    );
 
-  //     // axios.get.mockImplementation((url) => {
-  //     //   switch (url) {
-  //     //     case "api/v1/category/get-category":
-  //     //       return mockFn();
-  //     //     default:
-  //     //       return Promise.reject(new Error("not found"));
-  //     //     //   () => {
-  //     //     //     data: {
-  //     //     //       category: [
-  //     //     //         { _id: 1, name: "Electronics" },
-  //     //     //         { _id: 2, name: "Book" },
-  //     //     //         { _id: 3, name: "Clothing" },
-  //     //     //       ];
-  //     //     //     }
-  //     //     //   };
-  //     //   }
-  //     // });
-  //     const { getByText, getByDisplayValue } = render(
-  //       <MemoryRouter initialEntries={["/"]}>
-  //         <Routes>
-  //           <Route path="/" element={<HomePage />} />
-  //         </Routes>
-  //       </MemoryRouter>
-  //     );
-  //     expect(mockFn).toHaveBeenCalledTimes(4);
-  //     expect(getByText("Electronics")).toBeInTheDocument();
-  //     expect(getByText("Book")).toBeInTheDocument();
-  //     expect(getByText("Clothing")).toBeInTheDocument();
-  //   });
+    const { getByText, getByDisplayValue } = render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    waitFor(() => {
+      expect(getByText("Electronics")).toBeInTheDocument();
+      expect(getByText("Book")).toBeInTheDocument();
+      expect(getByText("Clothing")).toBeInTheDocument();
+    });
+  });
 
   it("shows all categories when category tab is clicked", () => {
     const { getAllByText } = render(
