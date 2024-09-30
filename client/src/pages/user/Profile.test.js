@@ -138,7 +138,7 @@ describe('Profile Component', () => {
                 updatedUser: {
                     id: 1,
                     name: 'John Doe 2',
-                    email: 'password123',
+                    email: 'john.doe@example.com',
                     phone: '987654321',
                     address: '2 Computing Drive'
                 }
@@ -159,7 +159,14 @@ describe('Profile Component', () => {
 
         fireEvent.click(getByText('UPDATE'));
 
-        await waitFor(() => expect(axios.put).toHaveBeenCalled())
+        await waitFor(() => expect(axios.put).toHaveBeenCalledWith("/api/v1/auth/profile",{
+            name: 'John Doe 2',
+            password: 'password123',
+            email: 'john.doe@example.com',
+            phone: '987654321',
+            address: '2 Computing Drive'
+        }));
+
         expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
     });
 
@@ -214,4 +221,27 @@ describe('Profile Component', () => {
         expect(toast.error).toHaveBeenCalledWith("Error Message");
     });
 
+    it('should disable the email field', () => {
+        const { getByPlaceholderText } = render(
+            <MemoryRouter initialEntries={['/user/profile']}>
+                <Routes>
+                    <Route path="/user/profile" element={<Profile />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        expect(getByPlaceholderText('Enter Your Email')).toBeDisabled();
+    });
+
+    it('should hide the password input', () => {
+        const { getByPlaceholderText } = render(
+            <MemoryRouter initialEntries={['/user/profile']}>
+                <Routes>
+                    <Route path="/user/profile" element={<Profile />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        const passwordInput = getByPlaceholderText('Enter Your Password');
+        expect(passwordInput).toHaveAttribute('type', 'password');
+    });
 });
