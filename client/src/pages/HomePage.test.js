@@ -40,6 +40,32 @@ jest.mock("./HomePage", () => {
     // ]),
   };
 });
+const productModel = (id, name, price, description, slug) => ({
+  _id: id,
+  name: name,
+  price: price,
+  description: description,
+  slug: slug,
+});
+
+const mockGetResponses = () => {
+  switch (url) {
+    case "/api/v1/category/get-category":
+      return { data: { success: true, category: [] } };
+    case `/api/v1/product/product-list/0`:
+      return { data: { products: [] } };
+    case `/api/v1/product/product-list/1`:
+      return { data: { products: [] } };
+    case "/api/v1/product/product-count":
+      return { data: { total: 1 } };
+  }
+};
+
+const mockPostResponses = () => {
+  switch ((url, body)) {
+    case "/api/v1/product/product-filters":
+  }
+};
 
 Object.defineProperty(window, "localStorage", {
   value: {

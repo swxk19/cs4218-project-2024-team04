@@ -52,6 +52,7 @@ jest.mock("../context/auth", () => ({
 const cartMock = jest.fn();
 cartMock
   .mockReturnValueOnce([])
+  .mockReturnValueOnce([{ price: 100 }])
   .mockReturnValueOnce([{ price: 100 }, { price: 200 }])
   .mockReturnValueOnce([]);
 
@@ -61,7 +62,12 @@ describe("CartPage Component", () => {
     expect(total).toBe("$0.00");
   });
 
-  it("should return total price of 300 when cart has 2 items", () => {
+  it("should return total price of 0 when cart has one item", () => {
+    const total = totalPrice(cartMock());
+    expect(total).toBe("$100.00");
+  });
+
+  it("should return total price of 300 when cart has more than one items", () => {
     const total = totalPrice(cartMock());
     expect(total).toBe("$300.00");
   });
@@ -83,11 +89,35 @@ describe("CartPage Component", () => {
     expect(localStorageMock).toHaveBeenCalledTimes(1);
   });
 
-  it("should display Make Payment button when cart has items", async () => {
+  it("should display Make Payment button when cart has one item", async () => {
+    useCart.mockReturnValue([
+      [{ price: 100, name: "pants", description: "good pants" }],
+      jest.fn(),
+    ]);
+    // useCart.mockReturnValue([null, jest.fn()]);
+    const { getByText, queryByText } = await act(() =>
+      Promise.resolve(
+        render(
+          <MemoryRouter initialEntries={["/cart"]}>
+            <Routes>
+              <Route path="/cart" element={<CartPage />} />
+            </Routes>
+          </MemoryRouter>
+        )
+      )
+    );
+    // waitFor(() => {
+    //  expect(getByText("Make Payment")).toBeInTheDocument();
+    // });
+    expect(getByText("Make Payment")).toBeInTheDocument();
+  });
+
+  it("should display Make Payment button when cart has more than one items", async () => {
     useCart.mockReturnValue([
       [
         { price: 100, name: "pants", description: "good pants" },
         { price: 200, name: "shirt", description: "good shirt" },
+        { price: 300, name: "shoe", description: "good shoe" },
       ],
       jest.fn(),
     ]);
@@ -110,13 +140,6 @@ describe("CartPage Component", () => {
   });
 
   it("should NOT display Make Payment button when cart is empty", async () => {
-    // useCart.mockReturnValue([
-    //   [
-    //     { price: 100, name: "pants", description: "good pants" },
-    //     { price: 200, name: "shirt", description: "good shirt" },
-    //   ],
-    //   jest.fn(),
-    // ]);
     useCart.mockReturnValue([null, jest.fn()]);
     const { getByText, queryByText } = await act(() =>
       Promise.resolve(
