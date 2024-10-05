@@ -74,6 +74,69 @@ describe('Orders Component', () => {
         expect(screen.queryByText('Quantity')).not.toBeInTheDocument();
     })
 
+
+    it('renders order table correctly with 1 success order', async () => {
+
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
+        axios.get.mockResolvedValue({
+            data: [
+                {
+                    "products": [
+                        {
+                            "_id": "1",
+                            "name": "Shoes",
+                            "description": "Classic shoes",
+                            "price": 99.99
+                        }
+                    ],
+                    "payment": {
+                        "success": false
+                    },
+                    "buyer": {
+                        "name": "John Doe"
+                    },
+                    "status": "Not Process",
+                    "createdAt": "2024-09-14T08:26:06.070Z"
+                }
+            ]
+        });
+
+        render(
+            <MemoryRouter initialEntries={['/user/orders']}>
+                <Routes>
+                    <Route path="/user/orders" element={<Orders />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(axios.get).toHaveBeenCalledTimes(1);
+
+            expect(screen.getByText('#')).toBeInTheDocument();
+            expect(screen.getByText('Status')).toBeInTheDocument();
+            expect(screen.getByText('Buyer')).toBeInTheDocument();
+            expect(screen.getByText('Date')).toBeInTheDocument();
+            expect(screen.getByText('Payment')).toBeInTheDocument();
+            expect(screen.getByText('Quantity')).toBeInTheDocument();
+
+            expect(screen.getAllByText('1')).toHaveLength(2);
+            expect(screen.getByText('1 Hour Ago')).toBeInTheDocument();
+            expect(screen.getByText('Not Process')).toBeInTheDocument();
+            expect(screen.getByText('John Doe')).toBeInTheDocument();
+            expect(screen.getByText('Failed')).toBeInTheDocument();
+            expect(screen.getByText('Shoes')).toBeInTheDocument();
+            expect(screen.getByText('Classic shoes')).toBeInTheDocument();
+            expect(screen.getByText('Price : 99.99')).toBeInTheDocument();
+
+            expect(moment).toHaveBeenCalledWith("2024-09-14T08:26:06.070Z");
+        });
+    });
+
     it('renders order table correctly with 1 failed and 1 success order', async () => {
 
         useAuth.mockReturnValue([{
