@@ -669,6 +669,71 @@ describe("HomePage Component_v2", () => {
       });
       expect(window.location.reload).toHaveBeenCalled();
     });
+
+    //expected to fail
+    describe("and users press Loadmore button", () => {
+      test("users should be able to view more filtered products", async () => {
+        axios.post.mockImplementation((url, body) => {
+          return mockPostResponses(url, body);
+        });
+        axios.get.mockImplementation((url) => {
+          return mockGetReponsesWithMoreProducts(url);
+        });
+        const { queryByText, getByRole } = await act(() =>
+          Promise.resolve(
+            render(
+              <MemoryRouter initialEntries={["/"]}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                </Routes>
+              </MemoryRouter>
+            )
+          )
+        );
+
+        const electronics = getByRole("checkbox", { name: "Electronics" });
+
+        expect(electronics).not.toBeChecked();
+        await act(async () => {
+          fireEvent.click(electronics);
+        });
+        expect(electronics).toBeChecked();
+
+        expect(queryByText("Product 0")).toBeInTheDocument();
+        expect(queryByText("Product 3")).toBeInTheDocument();
+        expect(queryByText("Product 6")).toBeInTheDocument();
+        expect(queryByText("Product 9")).toBeInTheDocument();
+
+        expect(queryByText("Product 1")).not.toBeInTheDocument();
+        expect(queryByText("Product 2")).not.toBeInTheDocument();
+        expect(queryByText("Product 4")).not.toBeInTheDocument();
+        expect(queryByText("Product 5")).not.toBeInTheDocument();
+        expect(queryByText("Product 7")).not.toBeInTheDocument();
+        expect(queryByText("Product 8")).not.toBeInTheDocument();
+        expect(queryByText("Product 10")).not.toBeInTheDocument();
+        expect(queryByText("Product 11")).not.toBeInTheDocument();
+
+        const loadmore = getByRole("button", { name: "Loadmore" });
+
+        await act(async () => {
+          fireEvent.click(loadmore);
+        });
+
+        expect(queryByText("Product 0")).toBeInTheDocument();
+        expect(queryByText("Product 3")).toBeInTheDocument();
+        expect(queryByText("Product 6")).toBeInTheDocument();
+        expect(queryByText("Product 9")).toBeInTheDocument();
+
+        expect(queryByText("Product 1")).not.toBeInTheDocument();
+        expect(queryByText("Product 2")).not.toBeInTheDocument();
+        expect(queryByText("Product 4")).not.toBeInTheDocument();
+        expect(queryByText("Product 5")).not.toBeInTheDocument();
+        expect(queryByText("Product 7")).not.toBeInTheDocument();
+        expect(queryByText("Product 8")).not.toBeInTheDocument();
+        expect(queryByText("Product 10")).not.toBeInTheDocument();
+        expect(queryByText("Product 11")).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe("when current number of products is less then the total number of products", () => {
