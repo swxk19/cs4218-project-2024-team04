@@ -74,7 +74,6 @@ describe('Orders Component', () => {
         expect(screen.queryByText('Quantity')).not.toBeInTheDocument();
     })
 
-
     it('renders order table correctly with 1 success order', async () => {
 
         useAuth.mockReturnValue([{
