@@ -5,9 +5,22 @@ import '@testing-library/jest-dom/extend-expect'
 import Orders from './Orders';
 import axios from "axios";
 import moment from "moment";
+import { useAuth } from "../../context/auth";
 
 jest.mock('axios')
 jest.mock('react-hot-toast')
+
+jest.mock("../../components/Layout", () => ({ children, title }) => (
+        <div>
+            <title>
+                {title}
+            </title>
+            <main>
+                {children}
+            </main>
+        </div>
+    )
+);
 
 jest.mock('moment', () => {
     return jest.fn(() => ({
@@ -16,32 +29,8 @@ jest.mock('moment', () => {
 });
 
 jest.mock('../../context/auth', () => ({
-    useAuth: jest.fn(() => [{
-        token: '123',
-    }, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
+    useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
 }));
-
-jest.mock('../../context/cart', () => ({
-    useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
-}));
-
-jest.mock('../../context/search', () => ({
-    useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-}));
-
-jest.mock('../../hooks/useCategory', () => ({
-    __esModule: true,
-    default: jest.fn(() => [])
-}));
-
-Object.defineProperty(window, 'localStorage', {
-    value: {
-        setItem: jest.fn(),
-        getItem: jest.fn(),
-        removeItem: jest.fn(),
-    },
-    writable: true,
-});
 
 describe('Orders Component', () => {
 
@@ -55,6 +44,11 @@ describe('Orders Component', () => {
     });
 
     it('does not render any table with 0 orders', async () => {
+
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: []
         });
@@ -67,6 +61,10 @@ describe('Orders Component', () => {
             </MemoryRouter>
         );
 
+        await waitFor(() => {
+            expect(axios.get).toHaveBeenCalledTimes(1);
+        });
+
         expect(screen.getByText('All Orders')).toBeInTheDocument();
         expect(screen.queryByText('#')).not.toBeInTheDocument();
         expect(screen.queryByText('Status')).not.toBeInTheDocument();
@@ -77,6 +75,11 @@ describe('Orders Component', () => {
     })
 
     it('renders order table correctly with 1 failed and 1 success order', async () => {
+
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: [
                 {
@@ -135,6 +138,8 @@ describe('Orders Component', () => {
         expect(screen.getByText('All Orders')).toBeInTheDocument();
 
         await waitFor(() => {
+            expect(axios.get).toHaveBeenCalledTimes(1);
+
             expect(screen.getAllByText('#')).toHaveLength(2);
             expect(screen.getAllByText('Status')).toHaveLength(2);
             expect(screen.getAllByText('Buyer')).toHaveLength(2);
@@ -168,8 +173,13 @@ describe('Orders Component', () => {
     });
 
     it('console logs http errors', async () => {
+
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockRejectedValue(
-            new Error('Mock Error')
+            'Mock Error'
         );
 
         render(
@@ -181,8 +191,25 @@ describe('Orders Component', () => {
         );
 
         await waitFor(() => {
-            expect(console.log).toHaveBeenCalledWith(new Error('Mock Error'));
+            expect(console.log).toHaveBeenCalledWith('Mock Error');
         });
     });
 
+    it('should not call getOrders if token is null', async () => {
+        useAuth.mockReturnValue([{
+            token: null
+        }]);
+
+        render(
+            <MemoryRouter initialEntries={['/user/orders']}>
+                <Routes>
+                    <Route path="/user/orders" element={<Orders />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+            expect(axios.get).not.toHaveBeenCalled();
+        });
+    });
 });

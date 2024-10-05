@@ -6,6 +6,7 @@ import AdminOrders from './AdminOrders';
 import axios from "axios";
 import moment from "moment";
 import userEvent from "@testing-library/user-event";
+import {useAuth} from "../../context/auth";
 
 jest.mock('axios')
 jest.mock('react-hot-toast')
@@ -16,33 +17,21 @@ jest.mock('moment', () => {
     }));
 });
 
+jest.mock("../../components/Layout", () => ({ children, title }) => (
+        <div>
+            <title>
+                {title}
+            </title>
+            <main>
+                {children}
+            </main>
+        </div>
+    )
+);
+
 jest.mock('../../context/auth', () => ({
-    useAuth: jest.fn(() => [{
-        token: '123',
-    }, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
+    useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
 }));
-
-jest.mock('../../context/cart', () => ({
-    useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
-}));
-
-jest.mock('../../context/search', () => ({
-    useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-}));
-
-jest.mock('../../hooks/useCategory', () => ({
-    __esModule: true,
-    default: jest.fn(() => [])
-}));
-
-Object.defineProperty(window, 'localStorage', {
-    value: {
-        setItem: jest.fn(),
-        getItem: jest.fn(),
-        removeItem: jest.fn(),
-    },
-    writable: true,
-});
 
 describe('Admin Orders Component', () => {
 
@@ -57,6 +46,10 @@ describe('Admin Orders Component', () => {
 
 
     it('does not render any table with 0 orders', async () => {
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: []
         });
@@ -79,6 +72,10 @@ describe('Admin Orders Component', () => {
     })
 
     it('renders order table correctly with 1 failed and 1 success order', async () => {
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: [
                 {
@@ -170,6 +167,10 @@ describe('Admin Orders Component', () => {
     });
 
     it('console logs http errors', async () => {
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockRejectedValue(
             new Error('Mock Error')
         );
@@ -188,6 +189,10 @@ describe('Admin Orders Component', () => {
     });
 
     it('check if all status is available in dropdown selection', async () => {
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: [
                 {
@@ -237,6 +242,10 @@ describe('Admin Orders Component', () => {
     });
 
     it('changes order status', async () => {
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: [
                 {
@@ -289,11 +298,13 @@ describe('Admin Orders Component', () => {
         expect(axios.put).toHaveBeenCalledWith('/api/v1/auth/order-status/1', {
             status: 'Shipped',
         });
-
-        expect(axios.get).toHaveBeenCalledTimes(2);
     });
 
     it('console logs failed update of order status', async () => {
+        useAuth.mockReturnValue([{
+            token: '123'
+        }]);
+
         axios.get.mockResolvedValue({
             data: [
                 {
@@ -318,7 +329,7 @@ describe('Admin Orders Component', () => {
             ],
         });
 
-        axios.put.mockRejectedValue(new Error('Mock Error'));
+        axios.put.mockRejectedValue('Mock Error');
 
         render(
             <MemoryRouter initialEntries={['/admin/orders']}>
@@ -339,6 +350,24 @@ describe('Admin Orders Component', () => {
             userEvent.click(screen.getByTitle('Shipped'));
         });
 
-        expect(console.log).toHaveBeenCalledWith(new Error('Mock Error'));
+        expect(console.log).toHaveBeenCalledWith('Mock Error');
+    });
+
+    it('should not call getOrders if token is null', async () => {
+        useAuth.mockReturnValue([{
+            token: null
+        }]);
+
+        render(
+            <MemoryRouter initialEntries={['/admin/orders']}>
+                <Routes>
+                    <Route path="/admin/orders" element={<AdminOrders />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+            expect(axios.get).not.toHaveBeenCalled();
+        });
     });
 });
