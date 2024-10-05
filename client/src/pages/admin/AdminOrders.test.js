@@ -225,13 +225,12 @@ describe('Admin Orders Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('All Orders')).toBeInTheDocument();
-
         await waitFor(() => {
             const select = screen.getByRole('combobox');
             userEvent.click(select);
         });
 
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
         await waitFor(() => {
             expect(screen.getByTitle('Not Process')).toBeInTheDocument();
             expect(screen.getByTitle('Shipped')).toBeInTheDocument();
@@ -284,8 +283,6 @@ describe('Admin Orders Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('All Orders')).toBeInTheDocument();
-
         await waitFor(() => {
             const select = screen.getByRole('combobox');
             userEvent.click(select);
@@ -295,6 +292,7 @@ describe('Admin Orders Component', () => {
             userEvent.click(screen.getByTitle('Shipped'));
         });
 
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
         expect(axios.put).toHaveBeenCalledWith('/api/v1/auth/order-status/1', {
             status: 'Shipped',
         });
@@ -339,8 +337,6 @@ describe('Admin Orders Component', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('All Orders')).toBeInTheDocument();
-
         await waitFor(() => {
             const select = screen.getByRole('combobox');
             userEvent.click(select);
@@ -350,6 +346,7 @@ describe('Admin Orders Component', () => {
             userEvent.click(screen.getByTitle('Shipped'));
         });
 
+        expect(screen.getByText('All Orders')).toBeInTheDocument();
         expect(console.log).toHaveBeenCalledWith('Mock Error');
     });
 
