@@ -5,7 +5,6 @@ import { render } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import Categories from "./Categories";
 import "../hooks/useCategory";
-import { describe } from "node:test";
 import "@testing-library/jest-dom";
 import { act } from "@testing-library/react";
 
