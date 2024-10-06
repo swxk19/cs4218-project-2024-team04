@@ -158,11 +158,144 @@ describe('CreateProduct Component', () => {
         expect(previewImage.src).toBe('http://localhost/mocked-url')
     })
 
+    // UI doesn't send the "shipping" product value in its POST request to the
+    // server.
+    it.failing(
+        'sends POST request with all form data when "CREATE PRODUCT" is clicked',
+        async () => {
+            // Arrange
+            let capturedFormData
+            axios.post.mockImplementation((url, data) => {
+                capturedFormData = data
+                return Promise.resolve({
+                    data: { success: true, message: 'Product Created Successfully' },
+                })
+            })
+            const component = (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateProduct />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+            render(component)
+            await waitFor(() => {
+                expect(
+                    screen.getByRole('combobox', { name: /select a category/i })
+                ).toBeInTheDocument()
+            })
+
+            // Act
+            fireEvent.change(screen.getByPlaceholderText('write a name'), {
+                target: { value: 'Test Product' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a description'), {
+                target: { value: 'Test Description' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a Price'), {
+                target: { value: '100' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a quantity'), {
+                target: { value: '10' },
+            })
+            const categorySelect = screen.getByRole('combobox', { name: /select a category/i })
+            fireEvent.change(categorySelect, { target: { value: 'cat1' } })
+            const shippingSelect = screen.getByRole('combobox', { name: /select shipping/i })
+            fireEvent.change(shippingSelect, { target: { value: '1' } })
+            const fileInput = screen
+                .getByText('Upload Photo')
+                .closest('label')
+                .querySelector('input[type="file"]')
+            const file = new File(['test'], 'test.png', { type: 'image/png' })
+            fireEvent.change(fileInput, { target: { files: [file] } })
+            fireEvent.click(screen.getByText('CREATE PRODUCT'))
+
+            // Assert
+            await waitFor(() => {
+                expect(axios.post).toHaveBeenCalledWith(
+                    '/api/v1/product/create-product',
+                    expect.any(FormData)
+                )
+                expect(capturedFormData.get('name')).toBe('Test Product')
+                expect(capturedFormData.get('description')).toBe('Test Description')
+                expect(capturedFormData.get('price')).toBe('100')
+                expect(capturedFormData.get('quantity')).toBe('10')
+                expect(capturedFormData.get('category')).toBe('cat1')
+                expect(capturedFormData.get('shipping')).toBe('1')
+                const photoFile = capturedFormData.get('photo')
+                expect(photoFile).toBeInstanceOf(File)
+                expect(photoFile.name).toBe('test.png')
+                expect(photoFile.type).toBe('image/png')
+            })
+        }
+    )
+
+    // Displays a correctly spelled toast message "Product Updated Successfully"
+    // but its a `toast.error` rather than `toast.success`, as the if-else
+    // statement for success check is flipped.
+    it.failing(
+        'displays success message and navigates to products page on successful product creation',
+        async () => {
+            // Arrange
+            let capturedFormData
+            axios.post.mockImplementation((url, data) => {
+                capturedFormData = data
+                return Promise.resolve({
+                    data: { success: true, message: 'Product Created Successfully' },
+                })
+            })
+            const component = (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateProduct />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+            render(component)
+            await waitFor(() => {
+                expect(
+                    screen.getByRole('combobox', { name: /select a category/i })
+                ).toBeInTheDocument()
+            })
+
+            // Act
+            fireEvent.change(screen.getByPlaceholderText('write a name'), {
+                target: { value: 'Test Product' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a description'), {
+                target: { value: 'Test Description' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a Price'), {
+                target: { value: '100' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a quantity'), {
+                target: { value: '10' },
+            })
+            const categorySelect = screen.getByRole('combobox', { name: /select a category/i })
+            fireEvent.change(categorySelect, { target: { value: 'cat1' } })
+            const shippingSelect = screen.getByRole('combobox', { name: /select shipping/i })
+            fireEvent.change(shippingSelect, { target: { value: '1' } })
+            const fileInput = screen
+                .getByText('Upload Photo')
+                .closest('label')
+                .querySelector('input[type="file"]')
+            const file = new File(['test'], 'test.png', { type: 'image/png' })
+            fireEvent.change(fileInput, { target: { files: [file] } })
+            fireEvent.click(screen.getByText('CREATE PRODUCT'))
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Product Created Successfully')
+                expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products')
+            })
+        }
+    )
+
     // UI crashes on erroneous inputs:
     // https://github.com/cs4218/cs4218-project-2024-team04/issues/13
     // Edit: Fixed runtime error but UI displays a toast message "something
     // went wrong" which is not the error message returned by the backend.
-    it.failing('displays error message when submitting empty form', async () => {
+    it.failing('displays backend error message when submitting an empty form', async () => {
         // Arrange
         const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
         axios.post.mockRejectedValueOnce({
@@ -182,6 +315,9 @@ describe('CreateProduct Component', () => {
             </MemoryRouter>
         )
         render(component)
+        await waitFor(() => {
+            expect(screen.getByRole('combobox', { name: /select a category/i })).toBeInTheDocument()
+        })
 
         // Act
         await waitFor(() => {
@@ -194,72 +330,104 @@ describe('CreateProduct Component', () => {
         })
     })
 
-    // UI doesn't send the "shipping" product value in its POST request to the
-    // server.
-    it.failing('creates a new product successfully with correct form data', async () => {
-        // Arrange
-        let capturedFormData
-        axios.post.mockImplementation((url, data) => {
-            capturedFormData = data
-            return Promise.resolve({
-                data: { success: true, message: 'Product Created Successfully' },
+    // UI crashes on erroneous inputs:
+    // https://github.com/cs4218/cs4218-project-2024-team04/issues/13
+    // Edit: Fixed runtime error but UI displays a toast message "something
+    // went wrong" which is not the error message returned by the backend.
+    it.failing(
+        'displays backend error message when submitting form with some invalid inputs',
+        async () => {
+            // Arrange
+            const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
+            axios.post.mockRejectedValueOnce({
+                response: {
+                    status: 400,
+                    data: {
+                        success: false,
+                        message: BACKEND_ERROR_MESSAGE,
+                    },
+                },
             })
-        })
-        const component = (
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateProduct />} />
-                </Routes>
-            </MemoryRouter>
-        )
-        render(component)
-        await waitFor(() => {
-            expect(screen.getByRole('combobox', { name: /select a category/i })).toBeInTheDocument()
-        })
-
-        // Act
-        fireEvent.change(screen.getByPlaceholderText('write a name'), {
-            target: { value: 'Test Product' },
-        })
-        fireEvent.change(screen.getByPlaceholderText('write a description'), {
-            target: { value: 'Test Description' },
-        })
-        fireEvent.change(screen.getByPlaceholderText('write a Price'), {
-            target: { value: '100' },
-        })
-        fireEvent.change(screen.getByPlaceholderText('write a quantity'), {
-            target: { value: '10' },
-        })
-        const categorySelect = screen.getByRole('combobox', { name: /select a category/i })
-        fireEvent.change(categorySelect, { target: { value: 'cat1' } })
-        const shippingSelect = screen.getByRole('combobox', { name: /select shipping/i })
-        fireEvent.change(shippingSelect, { target: { value: '1' } })
-        const fileInput = screen
-            .getByText('Upload Photo')
-            .closest('label')
-            .querySelector('input[type="file"]')
-        const file = new File(['test'], 'test.png', { type: 'image/png' })
-        fireEvent.change(fileInput, { target: { files: [file] } })
-        fireEvent.click(screen.getByText('CREATE PRODUCT'))
-
-        // Assert
-        await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith(
-                '/api/v1/product/create-product',
-                expect.any(FormData)
+            const component = (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateProduct />} />
+                    </Routes>
+                </MemoryRouter>
             )
-            expect(capturedFormData.get('name')).toBe('Test Product')
-            expect(capturedFormData.get('description')).toBe('Test Description')
-            expect(capturedFormData.get('price')).toBe('100')
-            expect(capturedFormData.get('quantity')).toBe('10')
-            expect(capturedFormData.get('category')).toBe('cat1')
-            expect(capturedFormData.get('shipping')).toBe('1')
-            const photoFile = capturedFormData.get('photo')
-            expect(photoFile).toBeInstanceOf(File)
-            expect(photoFile.name).toBe('test.png')
-            expect(photoFile.type).toBe('image/png')
-            expect(toast.success).toHaveBeenCalledWith('Product Created Successfully')
-            expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/products')
-        })
-    })
+            render(component)
+            await waitFor(() => {
+                expect(
+                    screen.getByRole('combobox', { name: /select a category/i })
+                ).toBeInTheDocument()
+            })
+
+            // Act
+            fireEvent.change(screen.getByPlaceholderText('write a name'), {
+                target: { value: 'Test Product' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a description'), {
+                target: { value: 'Test Description' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a Price'), {
+                target: { value: '-1' },
+            })
+            fireEvent.change(screen.getByPlaceholderText('write a quantity'), {
+                target: { value: '0.1' },
+            })
+            const categorySelect = screen.getByRole('combobox', { name: /select a category/i })
+            fireEvent.change(categorySelect, { target: { value: 'cat1' } })
+            const shippingSelect = screen.getByRole('combobox', { name: /select shipping/i })
+            fireEvent.change(shippingSelect, { target: { value: '1' } })
+            const fileInput = screen
+                .getByText('Upload Photo')
+                .closest('label')
+                .querySelector('input[type="file"]')
+            const file = new File(['test'], 'test.png', { type: 'image/png' })
+            fireEvent.change(fileInput, { target: { files: [file] } })
+            fireEvent.click(screen.getByText('CREATE PRODUCT'))
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+            })
+        }
+    )
+
+    // UI crashes on erroneous inputs:
+    // https://github.com/cs4218/cs4218-project-2024-team04/issues/13
+    // Edit: Fixed runtime error but UI displays a toast message "something
+    // went wrong" which is not the error message returned by the backend.
+    it.failing(
+        'displays generic error message when server is down and POST request times out',
+        async () => {
+            // Arrange
+            const timeoutError = new Error('timeout of 5000ms exceeded')
+            timeoutError.code = 'ECONNABORTED'
+            axios.post.mockRejectedValueOnce(timeoutError)
+            const component = (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateProduct />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+            render(component)
+            await waitFor(() => {
+                expect(
+                    screen.getByRole('combobox', { name: /select a category/i })
+                ).toBeInTheDocument()
+            })
+
+            // Act
+            await waitFor(() => {
+                fireEvent.click(screen.getByText('CREATE PRODUCT'))
+            })
+
+            // Assert
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+            })
+        }
+    )
 })
