@@ -6,7 +6,6 @@ import { fireEvent, render, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import "@testing-library/jest-dom";
 import axios from "axios";
-import { before, describe } from "node:test";
 import { useCart } from "../context/cart";
 import { act } from "@testing-library/react";
 import { authModel, userModel, productModel } from "./TestModels";
@@ -115,7 +114,7 @@ describe("CartPage Component", () => {
       });
     });
 
-    describe("and has no token, no name, but has address, with valid client token and non empty cart", async () => {
+    describe("and has no token, no name, but has address, with valid client token and non empty cart", () => {
       it("should render page accordingly", async () => {
         useAuth.mockReturnValue([loggedInNoTokenNoNameAddressAuth, jest.fn()]);
         useCart.mockReturnValue([nonEmptyCart, jest.fn()]);

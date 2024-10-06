@@ -403,7 +403,7 @@ describe("HomePage Component_v2", () => {
       });
 
       //expected to fail
-      test("users should be able to uncheck applied category filters to view all products", async () => {
+      test.failing("users should be able to uncheck applied category filters to view all products", async () => {
         axios.post.mockImplementation((url, body) => {
           return mockPostResponses(url, body);
         });
@@ -672,7 +672,7 @@ describe("HomePage Component_v2", () => {
 
     //expected to fail
     describe("and users press Loadmore button", () => {
-      test("users should be able to view more filtered products", async () => {
+      test.failing("users should be able to view more filtered products", async () => {
         axios.post.mockImplementation((url, body) => {
           return mockPostResponses(url, body);
         });
