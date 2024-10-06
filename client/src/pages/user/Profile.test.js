@@ -11,39 +11,26 @@ import { useAuth } from "../../context/auth";
 jest.mock('axios')
 jest.mock('react-hot-toast')
 
+jest.mock("../../components/Layout", () => ({ children, title }) => (
+        <div>
+            <title>
+                {title}
+            </title>
+            <main>
+                {children}
+            </main>
+        </div>
+    )
+);
 
 jest.mock('../../context/auth', () => ({
     useAuth: jest.fn(() => [null, jest.fn()]) // Mock useAuth hook to return null state and a mock function for setAuth
 }));
 
-jest.mock('../../context/cart', () => ({
-    useCart: jest.fn(() => [null, jest.fn()]) // Mock useCart hook to return null state and a mock function
-}))
-
-jest.mock('../../context/search', () => ({
-    useSearch: jest.fn(() => [{ keyword: '' }, jest.fn()]) // Mock useSearch hook to return null state and a mock function
-}))
-
-Object.defineProperty(window, 'localStorage', {
-    value: {
-        setItem: jest.fn(),
-        getItem: jest.fn(),
-        removeItem: jest.fn(),
-    },
-    writable: true,
-})
-
-window.matchMedia = window.matchMedia || function() {
-    return {
-      matches: false,
-      addListener: function() {},
-      removeListener: function() {}
-    }
-};
-
 describe('Profile Component', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        jest.spyOn(global.console, 'log').mockImplementation(() => {});
         useAuth.mockReturnValue([{
             user: {
                 name: 'John Doe',
@@ -70,6 +57,9 @@ describe('Profile Component', () => {
         })
     })
 
+    afterEach(() => {
+        console.log.mockRestore();
+    });
 
 
     it('renders register form', () => {
@@ -130,7 +120,7 @@ describe('Profile Component', () => {
                 updatedUser: {
                     id: 1,
                     name: 'John Doe 2',
-                    email: 'password123',
+                    email: 'john.doe2@example.com',
                     phone: '987654321',
                     address: '2 Computing Drive'
                 }
@@ -145,26 +135,30 @@ describe('Profile Component', () => {
             </MemoryRouter>
         );
         fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe 2' } });
+        fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'john.doe2@example.com' } });
         fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
         fireEvent.change(getByPlaceholderText('Enter Your Phone'), { target: { value: '987654321' } });
         fireEvent.change(getByPlaceholderText('Enter Your Address'), { target: { value: '2 Computing Drive' } });
 
         fireEvent.click(getByText('UPDATE'));
 
-        await waitFor(() => expect(axios.put).toHaveBeenCalled())
+        await waitFor(() => expect(axios.put).toHaveBeenCalledWith("/api/v1/auth/profile",{
+            name: 'John Doe 2',
+            password: 'password123',
+            email: 'john.doe2@example.com',
+            phone: '987654321',
+            address: '2 Computing Drive'
+        }));
+
         expect(toast.success).toHaveBeenCalledWith("Profile Updated Successfully");
     });
 
     it('should show error message if update fails', async () => {
-        axios.put.mockRejectedValueOnce({
-            response: {
-                data: {
-                    error: 'Error Message'
-                }
-            }
-        });
+        axios.put.mockRejectedValueOnce(
+            'Mock Error'
+        );
 
-        const { getByPlaceholderText, getByText } = render(
+        const { getByText } = render(
             <MemoryRouter initialEntries={['/user/profile']}>
                 <Routes>
                     <Route path="/user/profile" element={<Profile />} />
@@ -172,36 +166,27 @@ describe('Profile Component', () => {
             </MemoryRouter>
         );
 
-        fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe 2' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Phone'), { target: { value: '987654321' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Address'), { target: { value: '2 Computing Drive' } });
-
         fireEvent.click(getByText('UPDATE'));
 
         await waitFor(() => expect(axios.put).toHaveBeenCalled());
         expect(toast.error).toHaveBeenCalledWith("Something went wrong");
+        expect(console.log).toHaveBeenCalledWith('Mock Error');
     });
 
-    it('should show error message if axios is successful, but internally there is an error', async () => {
+    it('should show error message if axios is successful, but there is an error backend', async () => {
         axios.put.mockResolvedValueOnce({
             data: {
                 error: 'Error Message'
             }
         });
 
-        const { getByPlaceholderText, getByText } = render(
+        const { getByText } = render(
             <MemoryRouter initialEntries={['/user/profile']}>
                 <Routes>
                     <Route path="/user/profile" element={<Profile />} />
                 </Routes>
             </MemoryRouter>
         );
-
-        fireEvent.change(getByPlaceholderText('Enter Your Name'), { target: { value: 'John Doe 2' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'password123' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Phone'), { target: { value: '987654321' } });
-        fireEvent.change(getByPlaceholderText('Enter Your Address'), { target: { value: '2 Computing Drive' } });
 
         fireEvent.click(getByText('UPDATE'));
 
@@ -209,4 +194,27 @@ describe('Profile Component', () => {
         expect(toast.error).toHaveBeenCalledWith("Error Message");
     });
 
+    it('should disable edit of email field in frontend', () => {
+        const { getByPlaceholderText } = render(
+            <MemoryRouter initialEntries={['/user/profile']}>
+                <Routes>
+                    <Route path="/user/profile" element={<Profile />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        expect(getByPlaceholderText('Enter Your Email')).toBeDisabled();
+    });
+
+    it('should hide the password input', () => {
+        const { getByPlaceholderText } = render(
+            <MemoryRouter initialEntries={['/user/profile']}>
+                <Routes>
+                    <Route path="/user/profile" element={<Profile />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        const passwordInput = getByPlaceholderText('Enter Your Password');
+        expect(passwordInput).toHaveAttribute('type', 'password');
+    });
 });
