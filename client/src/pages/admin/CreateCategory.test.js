@@ -192,7 +192,7 @@ describe('CreateCategory Component', () => {
     })
 
     describe('Create', () => {
-        it('creates a new category when no categories exist', async () => {
+        it('displays success message and refetches categories on successful category creation', async () => {
             axios.get
                 .mockResolvedValueOnce({ data: { success: true, category: [] } })
                 .mockResolvedValueOnce({
@@ -227,12 +227,13 @@ describe('CreateCategory Component', () => {
                 })
                 expect(toast.success).toHaveBeenCalledWith('My New Category is created')
                 expect(screen.getByText('My New Category')).toBeInTheDocument()
+                expect(axios.get).toHaveBeenCalledTimes(2) // initial fetch + refetch
             })
         })
 
         // Displays a toast message "somthing went wrong in input form" which is
         // both misspelled, and also not the error message returned by the backend.
-        it.failing('shows error when trying to create category with empty name', async () => {
+        it.failing('displays backend error message when submitting an empty form', async () => {
             const mockCategories = [
                 { _id: '1', name: 'Category 1' },
                 { _id: '2', name: 'Category 2' },
@@ -270,26 +271,33 @@ describe('CreateCategory Component', () => {
         })
 
         // Displays misspelled toast message "somthing went wrong in input form".
-        it.failing('displays error toast when category creation fails', async () => {
-            axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
-            axios.post.mockRejectedValueOnce(new Error('Creation failed'))
+        it.failing(
+            'displays generic error message when server is down and POST request timed out',
+            async () => {
+                axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
+                axios.post.mockRejectedValueOnce({
+                    isAxiosError: true,
+                    code: 'ECONNABORTED',
+                    message: 'Network Error',
+                })
 
-            render(
-                <MemoryRouter>
-                    <Routes>
-                        <Route path='/' element={<CreateCategory />} />
-                    </Routes>
-                </MemoryRouter>
-            )
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
 
-            const input = await screen.findByPlaceholderText('Enter new category')
-            fireEvent.change(input, { target: { value: 'New Category' } })
-            fireEvent.click(screen.getByText('Submit'))
+                const input = await screen.findByPlaceholderText('Enter new category')
+                fireEvent.change(input, { target: { value: 'New Category' } })
+                fireEvent.click(screen.getByText('Submit'))
 
-            await waitFor(() => {
-                expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
-            })
-        })
+                await waitFor(() => {
+                    expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
+                })
+            }
+        )
     })
 
     describe('Edit', () => {
