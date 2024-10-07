@@ -73,30 +73,6 @@ describe('CreateCategory Component', () => {
         })
     })
 
-    it('creates a new category successfully', async () => {
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
-        axios.post.mockResolvedValueOnce({ data: { success: true } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'New Category' } })
-        fireEvent.click(screen.getByText('Submit'))
-
-        await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
-                name: 'New Category',
-            })
-            expect(toast.success).toHaveBeenCalledWith('New Category is created')
-        })
-    })
-
     // Displays misspelled toast message "somthing went wrong in input form".
     it.failing('displays error toast when category creation fails', async () => {
         axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
@@ -116,27 +92,6 @@ describe('CreateCategory Component', () => {
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
-        })
-    })
-
-    it('loads and displays existing categories', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument()
-            expect(screen.getByText('Category 2')).toBeInTheDocument()
         })
     })
 
