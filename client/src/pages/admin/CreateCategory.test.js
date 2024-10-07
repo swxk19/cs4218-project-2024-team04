@@ -54,409 +54,482 @@ describe('CreateCategory Component', () => {
         jest.clearAllMocks()
     })
 
-    it('renders create category form and table', async () => {
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
+    describe('Misc. tests', () => {
+        it('renders create category form and table', async () => {
+            axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-        await waitFor(() => {
-            expect(screen.getByText('Manage Category')).toBeInTheDocument()
-            expect(screen.getByPlaceholderText('Enter new category')).toBeInTheDocument()
-            expect(screen.getByText('Name')).toBeInTheDocument()
-            expect(screen.getByText('Actions')).toBeInTheDocument()
-        })
-    })
-
-    it('creates a new category successfully', async () => {
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
-        axios.post.mockResolvedValueOnce({ data: { success: true } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'New Category' } })
-        fireEvent.click(screen.getByText('Submit'))
-
-        await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
-                name: 'New Category',
+            await waitFor(() => {
+                expect(screen.getByText('Manage Category')).toBeInTheDocument()
+                expect(screen.getByPlaceholderText('Enter new category')).toBeInTheDocument()
+                expect(screen.getByText('Name')).toBeInTheDocument()
+                expect(screen.getByText('Actions')).toBeInTheDocument()
             })
-            expect(toast.success).toHaveBeenCalledWith('New Category is created')
-        })
-    })
-
-    // Displays misspelled toast message "somthing went wrong in input form".
-    it.failing('displays error toast when category creation fails', async () => {
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
-        axios.post.mockRejectedValueOnce(new Error('Creation failed'))
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'New Category' } })
-        fireEvent.click(screen.getByText('Submit'))
-
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
-        })
-    })
-
-    it('loads and displays existing categories', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument()
-            expect(screen.getByText('Category 2')).toBeInTheDocument()
-        })
-    })
-
-    // Displays misspelled toast message "Something wwent wrong in getting catgeory".
-    it.failing('handles error when fetching categories fails due to unreachable server', async () => {
-        axios.get.mockRejectedValueOnce({
-            isAxiosError: true,
-            code: 'ECONNABORTED',
-            message: 'Network Error',
         })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
+        it('navigates to create category page when "Create Category" button is clicked', async () => {
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
-        })
-    })
+            fireEvent.click(screen.getByText('Create Category'))
 
-    // Displays misspelled toast message "Something wwent wrong in getting catgeory".
-    it.failing('handles error when fetching categories fails due to 500 Internal Server Error', async () => {
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 500,
-                data: 'Internal Server Error',
-            },
+            expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/create-category')
         })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
+        it('displays existing categories from mock database', async () => {
+            const mockCategories = [
+                { _id: '1', name: 'Category 1' },
+                { _id: '2', name: 'Category 2' },
+            ]
+            axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
-        })
-    })
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-    it('opens update modal when edit button is clicked', async () => {
-        const mockCategories = [{ _id: '1', name: 'Category 1' }]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByText('Edit'))
-        })
-
-        const editModal = await screen.findByTestId('edit-modal')
-        expect(editModal).toBeInTheDocument()
-
-        // Check if the input field in the modal has the correct initial value
-        const input = within(editModal).getByTestId('category-input')
-        expect(input).toHaveValue('Category 1')
-
-        // Check if the Submit button is present in the modal
-        const submitButton = within(editModal).getByTestId('submit-button')
-        expect(submitButton).toBeInTheDocument()
-    })
-
-    it('updates category successfully', async () => {
-        const mockCategories = [{ _id: '1', name: 'Category 1' }]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-        axios.put.mockResolvedValueOnce({ data: { success: true } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByText('Edit'))
-        })
-
-        // Getting the "Submit" button for editing category name.
-        const editModal = screen.getByTestId('edit-modal')
-        const input = within(editModal).getByTestId('category-input')
-        const submitButton = within(editModal).getByTestId('submit-button')
-
-        fireEvent.change(input, { target: { value: 'Updated Category' } })
-        fireEvent.click(submitButton)
-
-        await waitFor(() => {
-            expect(axios.put).toHaveBeenCalledWith('/api/v1/category/update-category/1', {
-                name: 'Updated Category',
+            await waitFor(() => {
+                expect(screen.getByText('Category 1')).toBeInTheDocument()
+                expect(screen.getByText('Category 2')).toBeInTheDocument()
             })
-            expect(toast.success).toHaveBeenCalledWith('Updated Category is updated')
-        })
-    })
-
-    it('deletes category successfully', async () => {
-        const mockCategories = [{ _id: '1', name: 'Category 1' }]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-        axios.delete.mockResolvedValueOnce({ data: { success: true } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByText('Delete'))
         })
 
-        await waitFor(() => {
-            expect(axios.delete).toHaveBeenCalledWith('/api/v1/category/delete-category/1')
-            expect(toast.success).toHaveBeenCalledWith('category is deleted')
-        })
-    })
+        it('opens update modal when edit button is clicked', async () => {
+            const mockCategories = [{ _id: '1', name: 'Category 1' }]
+            axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
 
-    it('navigates to create category page when "Create Category" button is clicked', async () => {
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-        fireEvent.click(screen.getByText('Create Category'))
-
-        expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/create-category')
-    })
-
-    it('displays existing categories from mock database', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument()
-            expect(screen.getByText('Category 2')).toBeInTheDocument()
-        })
-    })
-
-    it('creates a new category when no categories exist', async () => {
-        axios.get
-            .mockResolvedValueOnce({ data: { success: true, category: [] } })
-            .mockResolvedValueOnce({
-                data: { success: true, category: [{ _id: '1', name: 'My New Category' }] },
+            await waitFor(() => {
+                fireEvent.click(screen.getByText('Edit'))
             })
-        axios.post.mockResolvedValueOnce({
-            data: {
-                success: true,
-                message: 'new category created',
-                category: {
-                    _id: '1',
+
+            const editModal = await screen.findByTestId('edit-modal')
+            expect(editModal).toBeInTheDocument()
+
+            // Check if the input field in the modal has the correct initial value
+            const input = within(editModal).getByTestId('category-input')
+            expect(input).toHaveValue('Category 1')
+
+            // Check if the Submit button is present in the modal
+            const submitButton = within(editModal).getByTestId('submit-button')
+            expect(submitButton).toBeInTheDocument()
+        })
+
+        // Displays misspelled toast message "Something wwent wrong in getting catgeory".
+        it.failing(
+            'handles error when fetching categories fails due to unreachable server',
+            async () => {
+                axios.get.mockRejectedValueOnce({
+                    isAxiosError: true,
+                    code: 'ECONNABORTED',
+                    message: 'Network Error',
+                })
+
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
+
+                await waitFor(() => {
+                    expect(toast.error).toHaveBeenCalledWith(
+                        'Something went wrong in getting category'
+                    )
+                })
+            }
+        )
+
+        // Displays misspelled toast message "Something wwent wrong in getting catgeory".
+        it.failing(
+            'handles error when fetching categories fails due to 500 Internal Server Error',
+            async () => {
+                axios.get.mockRejectedValueOnce({
+                    response: {
+                        status: 500,
+                        data: 'Internal Server Error',
+                    },
+                })
+
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
+
+                await waitFor(() => {
+                    expect(toast.error).toHaveBeenCalledWith(
+                        'Something went wrong in getting category'
+                    )
+                })
+            }
+        )
+    })
+
+    describe('Create', () => {
+        it('displays success message and refetches categories on successful category creation', async () => {
+            axios.get
+                .mockResolvedValueOnce({ data: { success: true, category: [] } })
+                .mockResolvedValueOnce({
+                    data: { success: true, category: [{ _id: '1', name: 'My New Category' }] },
+                })
+            axios.post.mockResolvedValueOnce({
+                data: {
+                    success: true,
+                    message: 'new category created',
+                    category: {
+                        _id: '1',
+                        name: 'My New Category',
+                    },
+                },
+            })
+
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+
+            const input = await screen.findByPlaceholderText('Enter new category')
+            fireEvent.change(input, { target: { value: 'My New Category' } })
+            fireEvent.click(screen.getByText('Submit'))
+
+            await waitFor(() => {
+                expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
                     name: 'My New Category',
-                },
-            },
-        })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'My New Category' } })
-        fireEvent.click(screen.getByText('Submit'))
-
-        await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
-                name: 'My New Category',
+                })
+                expect(toast.success).toHaveBeenCalledWith('My New Category is created')
+                expect(screen.getByText('My New Category')).toBeInTheDocument()
+                expect(axios.get).toHaveBeenCalledTimes(2) // initial fetch + refetch
             })
-            expect(toast.success).toHaveBeenCalledWith('My New Category is created')
-            expect(screen.getByText('My New Category')).toBeInTheDocument()
         })
-    })
 
-    // Displays a toast message "somthing went wrong in input form" which is
-    // both misspelled, and also not the error message returned by the backend.
-    it.failing('shows error when trying to create category with empty name', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
+        // Displays a toast message "somthing went wrong in input form" which is
+        // both misspelled, and also not the error message returned by the backend.
+        it.failing('displays backend error message when submitting an empty form', async () => {
+            const mockCategories = [
+                { _id: '1', name: 'Category 1' },
+                { _id: '2', name: 'Category 2' },
+            ]
+            axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
 
-        const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
-        axios.post.mockRejectedValueOnce({
-            response: {
-                status: 400,
-                data: {
-                    success: false,
-                    message: BACKEND_ERROR_MESSAGE,
+            const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
+            axios.post.mockRejectedValueOnce({
+                response: {
+                    status: 400,
+                    data: {
+                        success: false,
+                        message: BACKEND_ERROR_MESSAGE,
+                    },
                 },
-            },
-        })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        const submitButton = await screen.findByText('Submit')
-        fireEvent.click(submitButton)
-
-        await waitFor(() => {
-            expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
-                name: '',
             })
-            expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+
+            const submitButton = await screen.findByText('Submit')
+            fireEvent.click(submitButton)
+
+            await waitFor(() => {
+                expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
+                    name: '',
+                })
+                expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+            })
         })
+
+        // Displays misspelled toast message "somthing went wrong in input form".
+        it.failing(
+            'displays generic error message when server is down and POST request timed out',
+            async () => {
+                axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
+                axios.post.mockRejectedValueOnce({
+                    isAxiosError: true,
+                    code: 'ECONNABORTED',
+                    message: 'Network Error',
+                })
+
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
+
+                const input = await screen.findByPlaceholderText('Enter new category')
+                fireEvent.change(input, { target: { value: 'New Category' } })
+                fireEvent.click(screen.getByText('Submit'))
+
+                await waitFor(() => {
+                    expect(axios.post).toHaveBeenCalledWith('/api/v1/category/create-category', {
+                        name: 'New Category',
+                    })
+                    expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
+                })
+            }
+        )
     })
 
-    // Displays the toast message "somthing went wrong in input form" which is
-    // both misspelled, and also not the error message returned by the backend.
-    it.failing('shows error when creating category with existing name', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
+    describe('Edit', () => {
+        it('displays success message and refetches categories on successful category edit', async () => {
+            const mockCategories = [{ _id: '1', name: 'Category 1' }]
+            axios.get.mockResolvedValueOnce({
+                data: { success: true, category: [{ _id: '1', name: 'Category 1' }] },
+            })
+            axios.get.mockResolvedValueOnce({
+                data: { success: true, category: [{ _id: '1', name: 'Updated Category' }] },
+            })
+            axios.put.mockResolvedValueOnce({ data: { success: true } })
 
-        const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
-        axios.post.mockRejectedValueOnce({
-            response: {
-                status: 400,
-                data: {
-                    success: false,
-                    message: BACKEND_ERROR_MESSAGE,
-                },
-            },
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+
+            await waitFor(() => {
+                fireEvent.click(screen.getByText('Edit'))
+            })
+
+            // Getting the "Submit" button for editing category name.
+            const editModal = screen.getByTestId('edit-modal')
+            const input = within(editModal).getByTestId('category-input')
+            const submitButton = within(editModal).getByTestId('submit-button')
+
+            fireEvent.change(input, { target: { value: 'Updated Category' } })
+            fireEvent.click(submitButton)
+
+            await waitFor(() => {
+                expect(axios.put).toHaveBeenCalledWith('/api/v1/category/update-category/1', {
+                    name: 'Updated Category',
+                })
+                expect(toast.success).toHaveBeenCalledWith('Updated Category is updated')
+                expect(axios.get).toHaveBeenCalledTimes(2) // initial fetch + refetch
+            })
         })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
+        // Displays the toast message "Somtihing went wrong" which is both
+        // misspelled, and also not the error message returned by the backend.
+        it.failing(
+            'displays backend error message when editing category to an existing name',
+            async () => {
+                const mockCategories = [
+                    { _id: '1', name: 'Category 1' },
+                    { _id: '2', name: 'Category 2' },
+                ]
+                axios.get.mockResolvedValueOnce({
+                    data: { success: true, category: mockCategories },
+                })
+
+                const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
+                axios.post.mockRejectedValueOnce({
+                    response: {
+                        status: 400,
+                        data: {
+                            success: false,
+                            message: BACKEND_ERROR_MESSAGE,
+                        },
+                    },
+                })
+
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
+
+                await waitFor(() => {
+                    fireEvent.click(screen.getAllByText('Edit')[0])
+                })
+
+                const editModal = screen.getByTestId('edit-modal')
+                const input = within(editModal).getByTestId('category-input')
+                const submitButton = within(editModal).getByTestId('submit-button')
+
+                fireEvent.change(input, { target: { value: 'Category 2' } })
+                fireEvent.click(submitButton)
+
+                await waitFor(() => {
+                    expect(axios.put).toHaveBeenCalledWith('/api/v1/category/update-category/1', {
+                        name: 'Category 2',
+                    })
+                    expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+                })
+            }
         )
 
-        const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'Category 1' } })
-        fireEvent.click(screen.getByText('Submit'))
+        // Displays misspelled toast message "Somtihing went wrong".
+        it.failing(
+            'displays generic error message when server is down and POST request timed out',
+            async () => {
+                axios.get.mockResolvedValueOnce({
+                    data: { success: true, category: [{ _id: '1', name: 'Category 1' }] },
+                })
+                axios.put.mockRejectedValueOnce({
+                    isAxiosError: true,
+                    code: 'ECONNABORTED',
+                    message: 'Network Error',
+                })
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
-        })
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
+
+                await waitFor(() => {
+                    fireEvent.click(screen.getByText('Edit'))
+                })
+
+                // Getting the "Submit" button for editing category name.
+                const editModal = screen.getByTestId('edit-modal')
+                const input = within(editModal).getByTestId('category-input')
+                const submitButton = within(editModal).getByTestId('submit-button')
+
+                fireEvent.change(input, { target: { value: 'Updated Category' } })
+                fireEvent.click(submitButton)
+
+                await waitFor(() => {
+                    expect(axios.put).toHaveBeenCalledWith('/api/v1/category/update-category/1', {
+                        name: 'Updated Category',
+                    })
+                    expect(toast.error).toHaveBeenCalledWith('Something went wrong')
+                })
+            }
+        )
     })
 
-    // Displays the toast message "Somtihing went wrong" which is both
-    // misspelled, and also not the error message returned by the backend.
-    it.failing('shows error when editing category to an existing name', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
+    describe('Delete', () => {
+        it('displays success message and refetches categories on successful category deletion', async () => {
+            axios.get.mockResolvedValueOnce({
+                data: { success: true, category: [{ _id: '1', name: 'Category 1' }] },
+            })
+            axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
+            axios.delete.mockResolvedValueOnce({ data: { success: true } })
 
-        const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
-        axios.post.mockRejectedValueOnce({
-            response: {
-                status: 400,
-                data: {
-                    success: false,
-                    message: BACKEND_ERROR_MESSAGE,
-                },
-            },
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
+
+            await waitFor(() => {
+                fireEvent.click(screen.getByText('Delete'))
+            })
+
+            await waitFor(() => {
+                expect(axios.delete).toHaveBeenCalledWith('/api/v1/category/delete-category/1')
+                expect(toast.success).toHaveBeenCalledWith('category is deleted')
+                expect(axios.get).toHaveBeenCalledTimes(2) // initial fetch + refetch
+            })
         })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
+        // Displays a toast message "Somtihing went wrong" which is both
+        // misspelled, and also not the error message returned by the backend.
+        it.failing(
+            'displays backend error message when deleting a non-existing category',
+            async () => {
+                axios.get.mockResolvedValueOnce({
+                    data: { success: true, category: [{ _id: '1', name: 'Category 1' }] },
+                })
+                const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
+                axios.delete.mockRejectedValueOnce({
+                    response: {
+                        status: 400,
+                        data: {
+                            success: false,
+                            message: BACKEND_ERROR_MESSAGE,
+                        },
+                    },
+                })
+
+                render(
+                    <MemoryRouter>
+                        <Routes>
+                            <Route path='/' element={<CreateCategory />} />
+                        </Routes>
+                    </MemoryRouter>
+                )
+
+                await waitFor(() => {
+                    fireEvent.click(screen.getByText('Delete'))
+                })
+
+                await waitFor(() => {
+                    expect(axios.delete).toHaveBeenCalledWith('/api/v1/category/delete-category/1')
+                    expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+                })
+            }
         )
 
-        await waitFor(() => {
-            fireEvent.click(screen.getAllByText('Edit')[0])
-        })
+        // Displays misspelled toast message "Somtihing went wrong".
+        it.failing('displays generic error message when server is down and POST request timed out', async () => {
+            axios.get.mockResolvedValueOnce({
+                data: { success: true, category: [{ _id: '1', name: 'Category 1' }] },
+            })
+            axios.put.mockRejectedValueOnce({
+                isAxiosError: true,
+                code: 'ECONNABORTED',
+                message: 'Network Error',
+            })
 
-        const editModal = screen.getByTestId('edit-modal')
-        const input = within(editModal).getByTestId('category-input')
-        const submitButton = within(editModal).getByTestId('submit-button')
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-        fireEvent.change(input, { target: { value: 'Category 2' } })
-        fireEvent.click(submitButton)
+            await waitFor(() => {
+                fireEvent.click(screen.getByText('Delete'))
+            })
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+            await waitFor(() => {
+                expect(axios.delete).toHaveBeenCalledWith('/api/v1/category/delete-category/1')
+                expect(toast.error).toHaveBeenCalledWith('Something went wrong')
+            })
         })
     })
 })
