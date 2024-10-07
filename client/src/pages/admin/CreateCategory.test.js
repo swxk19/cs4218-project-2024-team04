@@ -137,47 +137,53 @@ describe('CreateCategory Component', () => {
     })
 
     // Displays misspelled toast message "Something wwent wrong in getting catgeory".
-    it.failing('handles error when fetching categories fails due to unreachable server', async () => {
-        axios.get.mockRejectedValueOnce({
-            isAxiosError: true,
-            code: 'ECONNABORTED',
-            message: 'Network Error',
-        })
+    it.failing(
+        'handles error when fetching categories fails due to unreachable server',
+        async () => {
+            axios.get.mockRejectedValueOnce({
+                isAxiosError: true,
+                code: 'ECONNABORTED',
+                message: 'Network Error',
+            })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
-        })
-    })
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
+            })
+        }
+    )
 
     // Displays misspelled toast message "Something wwent wrong in getting catgeory".
-    it.failing('handles error when fetching categories fails due to 500 Internal Server Error', async () => {
-        axios.get.mockRejectedValueOnce({
-            response: {
-                status: 500,
-                data: 'Internal Server Error',
-            },
-        })
+    it.failing(
+        'handles error when fetching categories fails due to 500 Internal Server Error',
+        async () => {
+            axios.get.mockRejectedValueOnce({
+                response: {
+                    status: 500,
+                    data: 'Internal Server Error',
+                },
+            })
 
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
+            render(
+                <MemoryRouter>
+                    <Routes>
+                        <Route path='/' element={<CreateCategory />} />
+                    </Routes>
+                </MemoryRouter>
+            )
 
-        await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
-        })
-    })
+            await waitFor(() => {
+                expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
+            })
+        }
+    )
 
     it('creates a new category when no categories exist', async () => {
         axios.get
