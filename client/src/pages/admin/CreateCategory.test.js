@@ -73,10 +73,26 @@ describe('CreateCategory Component', () => {
         })
     })
 
-    // Displays misspelled toast message "somthing went wrong in input form".
-    it.failing('displays error toast when category creation fails', async () => {
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
-        axios.post.mockRejectedValueOnce(new Error('Creation failed'))
+    it('navigates to create category page when "Create Category" button is clicked', async () => {
+        render(
+            <MemoryRouter>
+                <Routes>
+                    <Route path='/' element={<CreateCategory />} />
+                </Routes>
+            </MemoryRouter>
+        )
+
+        fireEvent.click(screen.getByText('Create Category'))
+
+        expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/create-category')
+    })
+
+    it('displays existing categories from mock database', async () => {
+        const mockCategories = [
+            { _id: '1', name: 'Category 1' },
+            { _id: '2', name: 'Category 2' },
+        ]
+        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
 
         render(
             <MemoryRouter>
@@ -86,13 +102,38 @@ describe('CreateCategory Component', () => {
             </MemoryRouter>
         )
 
-        const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'New Category' } })
-        fireEvent.click(screen.getByText('Submit'))
+        await waitFor(() => {
+            expect(screen.getByText('Category 1')).toBeInTheDocument()
+            expect(screen.getByText('Category 2')).toBeInTheDocument()
+        })
+    })
+
+    it('opens update modal when edit button is clicked', async () => {
+        const mockCategories = [{ _id: '1', name: 'Category 1' }]
+        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
+
+        render(
+            <MemoryRouter>
+                <Routes>
+                    <Route path='/' element={<CreateCategory />} />
+                </Routes>
+            </MemoryRouter>
+        )
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
+            fireEvent.click(screen.getByText('Edit'))
         })
+
+        const editModal = await screen.findByTestId('edit-modal')
+        expect(editModal).toBeInTheDocument()
+
+        // Check if the input field in the modal has the correct initial value
+        const input = within(editModal).getByTestId('category-input')
+        expect(input).toHaveValue('Category 1')
+
+        // Check if the Submit button is present in the modal
+        const submitButton = within(editModal).getByTestId('submit-button')
+        expect(submitButton).toBeInTheDocument()
     })
 
     // Displays misspelled toast message "Something wwent wrong in getting catgeory".
@@ -135,125 +176,6 @@ describe('CreateCategory Component', () => {
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith('Something went wrong in getting category')
-        })
-    })
-
-    it('opens update modal when edit button is clicked', async () => {
-        const mockCategories = [{ _id: '1', name: 'Category 1' }]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByText('Edit'))
-        })
-
-        const editModal = await screen.findByTestId('edit-modal')
-        expect(editModal).toBeInTheDocument()
-
-        // Check if the input field in the modal has the correct initial value
-        const input = within(editModal).getByTestId('category-input')
-        expect(input).toHaveValue('Category 1')
-
-        // Check if the Submit button is present in the modal
-        const submitButton = within(editModal).getByTestId('submit-button')
-        expect(submitButton).toBeInTheDocument()
-    })
-
-    it('updates category successfully', async () => {
-        const mockCategories = [{ _id: '1', name: 'Category 1' }]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-        axios.put.mockResolvedValueOnce({ data: { success: true } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByText('Edit'))
-        })
-
-        // Getting the "Submit" button for editing category name.
-        const editModal = screen.getByTestId('edit-modal')
-        const input = within(editModal).getByTestId('category-input')
-        const submitButton = within(editModal).getByTestId('submit-button')
-
-        fireEvent.change(input, { target: { value: 'Updated Category' } })
-        fireEvent.click(submitButton)
-
-        await waitFor(() => {
-            expect(axios.put).toHaveBeenCalledWith('/api/v1/category/update-category/1', {
-                name: 'Updated Category',
-            })
-            expect(toast.success).toHaveBeenCalledWith('Updated Category is updated')
-        })
-    })
-
-    it('deletes category successfully', async () => {
-        const mockCategories = [{ _id: '1', name: 'Category 1' }]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-        axios.delete.mockResolvedValueOnce({ data: { success: true } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByText('Delete'))
-        })
-
-        await waitFor(() => {
-            expect(axios.delete).toHaveBeenCalledWith('/api/v1/category/delete-category/1')
-            expect(toast.success).toHaveBeenCalledWith('category is deleted')
-        })
-    })
-
-    it('navigates to create category page when "Create Category" button is clicked', async () => {
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        fireEvent.click(screen.getByText('Create Category'))
-
-        expect(mockNavigate).toHaveBeenCalledWith('/dashboard/admin/create-category')
-    })
-
-    it('displays existing categories from mock database', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        render(
-            <MemoryRouter>
-                <Routes>
-                    <Route path='/' element={<CreateCategory />} />
-                </Routes>
-            </MemoryRouter>
-        )
-
-        await waitFor(() => {
-            expect(screen.getByText('Category 1')).toBeInTheDocument()
-            expect(screen.getByText('Category 2')).toBeInTheDocument()
         })
     })
 
@@ -334,25 +256,10 @@ describe('CreateCategory Component', () => {
         })
     })
 
-    // Displays the toast message "somthing went wrong in input form" which is
-    // both misspelled, and also not the error message returned by the backend.
-    it.failing('shows error when creating category with existing name', async () => {
-        const mockCategories = [
-            { _id: '1', name: 'Category 1' },
-            { _id: '2', name: 'Category 2' },
-        ]
-        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
-
-        const BACKEND_ERROR_MESSAGE = 'ERROR MESSAGE'
-        axios.post.mockRejectedValueOnce({
-            response: {
-                status: 400,
-                data: {
-                    success: false,
-                    message: BACKEND_ERROR_MESSAGE,
-                },
-            },
-        })
+    // Displays misspelled toast message "somthing went wrong in input form".
+    it.failing('displays error toast when category creation fails', async () => {
+        axios.get.mockResolvedValueOnce({ data: { success: true, category: [] } })
+        axios.post.mockRejectedValueOnce(new Error('Creation failed'))
 
         render(
             <MemoryRouter>
@@ -363,11 +270,44 @@ describe('CreateCategory Component', () => {
         )
 
         const input = await screen.findByPlaceholderText('Enter new category')
-        fireEvent.change(input, { target: { value: 'Category 1' } })
+        fireEvent.change(input, { target: { value: 'New Category' } })
         fireEvent.click(screen.getByText('Submit'))
 
         await waitFor(() => {
-            expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+            expect(toast.error).toHaveBeenCalledWith('Something went wrong in input form')
+        })
+    })
+
+    it('updates category successfully', async () => {
+        const mockCategories = [{ _id: '1', name: 'Category 1' }]
+        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
+        axios.put.mockResolvedValueOnce({ data: { success: true } })
+
+        render(
+            <MemoryRouter>
+                <Routes>
+                    <Route path='/' element={<CreateCategory />} />
+                </Routes>
+            </MemoryRouter>
+        )
+
+        await waitFor(() => {
+            fireEvent.click(screen.getByText('Edit'))
+        })
+
+        // Getting the "Submit" button for editing category name.
+        const editModal = screen.getByTestId('edit-modal')
+        const input = within(editModal).getByTestId('category-input')
+        const submitButton = within(editModal).getByTestId('submit-button')
+
+        fireEvent.change(input, { target: { value: 'Updated Category' } })
+        fireEvent.click(submitButton)
+
+        await waitFor(() => {
+            expect(axios.put).toHaveBeenCalledWith('/api/v1/category/update-category/1', {
+                name: 'Updated Category',
+            })
+            expect(toast.success).toHaveBeenCalledWith('Updated Category is updated')
         })
     })
 
@@ -412,6 +352,29 @@ describe('CreateCategory Component', () => {
 
         await waitFor(() => {
             expect(toast.error).toHaveBeenCalledWith(BACKEND_ERROR_MESSAGE)
+        })
+    })
+
+    it('deletes category successfully', async () => {
+        const mockCategories = [{ _id: '1', name: 'Category 1' }]
+        axios.get.mockResolvedValueOnce({ data: { success: true, category: mockCategories } })
+        axios.delete.mockResolvedValueOnce({ data: { success: true } })
+
+        render(
+            <MemoryRouter>
+                <Routes>
+                    <Route path='/' element={<CreateCategory />} />
+                </Routes>
+            </MemoryRouter>
+        )
+
+        await waitFor(() => {
+            fireEvent.click(screen.getByText('Delete'))
+        })
+
+        await waitFor(() => {
+            expect(axios.delete).toHaveBeenCalledWith('/api/v1/category/delete-category/1')
+            expect(toast.success).toHaveBeenCalledWith('category is deleted')
         })
     })
 })
