@@ -1,7 +1,3 @@
-// sampleOrders.js
-const mongoose = require('mongoose');
-
-// Initially, leave products and buyer fields as empty arrays or placeholders to be populated dynamically later.
 const orders = [
   {
     products: [], // To be filled with actual product IDs
@@ -55,4 +51,4 @@ const orders = [
   },
 ];
 
-module.exports = orders;
+export default orders;

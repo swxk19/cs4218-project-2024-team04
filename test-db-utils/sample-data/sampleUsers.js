@@ -1,4 +1,3 @@
-// sampleUsers.js
 const users = [
     {
       name: 'John Doe',
@@ -77,4 +76,4 @@ const users = [
     },
   ];
 
-  module.exports = users;
+  export default users
