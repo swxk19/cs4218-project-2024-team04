@@ -35,10 +35,11 @@
     "slugify": "^1.6.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
-    "@babel/preset-env": "^7.24.5",
+    "@babel/core": "^7.25.8",
+    "@babel/preset-env": "^7.25.8",
     "@babel/preset-react": "^7.24.1",
     "@playwright/test": "^1.44.0",
+    "@shelf/jest-mongodb": "^4.3.2",
     "@types/node": "^20.12.12",
     "babel-jest": "^29.7.0",
     "identity-obj-proxy": "^3.0.0",
@@ -47,6 +48,10 @@
     "sonarqube-scanner": "^3.3.0"
   },
   "jest": {
+    "preset": "@shelf/jest-mongodb",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "testEnvironment": "jest-environment-jsdom",
     "testPathIgnorePatterns": [
       "/_site",
