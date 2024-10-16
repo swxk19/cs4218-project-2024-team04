@@ -43,6 +43,13 @@ describe('User API Test', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.user).toBeDefined();
     expect(response.body.user.email).toBe(newUser.email);
+
+    // Check the database to see if the user was created
+    const savedUser = await User.findOne({ email: newUser.email });
+    expect(savedUser).toBeDefined(); // Ensure the user exists in the database
+    expect(savedUser.email).toBe(newUser.email); // Ensure the email matches
+    expect(savedUser.name).toBe(newUser.name); // Ensure the name matches
+    expect(savedUser.address.street).toBe(newUser.address.street);
   });
 
   it.failing('should fail to create a user with missing required fields via API', async () => {
