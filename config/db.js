@@ -3,6 +3,7 @@ import colors from "colors";
 import dotenv from "dotenv";
 
 
+var mongoUrl = undefined
 if (process.env.NODE_ENV === "production") {
     dotenv.config({ path: "./env" }); // default to dev server, no real prod db
     mongoUrl = process.env.MONGO_URL
