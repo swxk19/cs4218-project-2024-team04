@@ -5,15 +5,18 @@ const User = require('./models/userModel');
 const Order = require('./models/orderModel');
 
 // Import sample data
-const categories = require('./sampleData/sampleCategories');
-const products = require('./sampleData/sampleProducts');
-const users = require('./sampleData/sampleUsers');
-const orders = require('./sampleData/sampleOrders');
+const categories = require('./sample-data/sampleCategories');
+const products = require('./sample-data/sampleProducts');
+const users = require('./sample-data/sampleUsers');
+const orders = require('./sample-data/sampleOrders');
 
 async function resetDatabase() {
   try {
+    if (!dbUrl.endsWith('cs4218-test')) {
+      throw new Error('Not test db');
+    }
     // Connect to the test database
-    await mongoose.connect(process.env.TEST_DB_URL || 'mongodb://localhost:27017/testdb', {
+    await mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
