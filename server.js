@@ -8,15 +8,6 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cors from "cors";
 
-if (process.env.NODE_ENV === "production") {
-  dotenv.config({ path: "./env" }); // default to dev server, no real prod db
-} else if (process.env.NODE_ENV === "test") {
-  dotenv.config({ path: "./.env.test" });
-} else {
-  dotenv.config({ path: "./.env" });
-
-}
-
 // Connect to the database
 await connectDB();
 
@@ -39,6 +30,7 @@ app.get("/", (req, res) => {
 
 // Only start the server if not in test environment
 const PORT = process.env.PORT || 6060;
+
 if (process.env.NODE_ENV !== "test") {
   app.listen(PORT, () => {
     console.log(
