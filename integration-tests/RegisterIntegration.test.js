@@ -1,11 +1,9 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
-import dotenv from 'dotenv';
 import app from '../server.js'; // Import the Express app from server.js
 import users from '../test-db-utils/sample-data/sampleUsers.js';
 import User from '../models/userModel.js'; // Import the User model
 
-dotenv.config({ path: '.env.test' }); // Load environment variables from .env.test
 
 // Setup and teardown for the database
 beforeAll(async () => {
