@@ -7,7 +7,8 @@
    
 ## Running UI tests
 1. Ensure current directory is at project root
-2. Run 'npm run ui-test' to run playwright tests
+2. Run 'npm run ui-test' to start test server
+3. Run 'npx playwright test --config=playwright.config.cjs', or for UI mode: 'npx playwright test --ui --config=playwright.config.cjs'
 
 ## Running integration tests
 1. Run 'npm run test'
