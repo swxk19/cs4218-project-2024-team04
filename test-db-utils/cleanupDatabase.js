@@ -1,4 +1,4 @@
-// tests/globalTeardown.js
+// tests/cleanupDatabase.js
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -11,7 +11,7 @@ import Category from '../models/categoryModel.js';
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
 
-const globalTeardown = async () => {
+export const cleanupDatabase = async () => {
   // Connect to the database
   await mongoose.connect(process.env.MONGO_TEST_URL, {
     useNewUrlParser: true,
@@ -29,5 +29,3 @@ const globalTeardown = async () => {
   // Disconnect from the database
   await mongoose.disconnect();
 };
-
-export default globalTeardown;
