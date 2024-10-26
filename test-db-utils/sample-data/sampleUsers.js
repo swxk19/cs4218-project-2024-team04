@@ -44,6 +44,15 @@ const users = [
     answer: 'purple',
     role: 0,
   },
+  {
+    name: 'Admin User',
+    email: 'admin@admin.com',
+    password: 'admin',
+    phone: '1112223333',
+    address: '101 Admin St, Admin City, Admin State, 11111, Admin Country',
+    answer: 'admin',
+    role: 1,
+  },
 ];
 
 export default users;
