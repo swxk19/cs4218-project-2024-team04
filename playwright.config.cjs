@@ -45,10 +45,4 @@ module.exports = defineConfig({
   /* Global setup and teardown */
   globalSetup: require.resolve('./test-db-utils/globalSetup.js'),
   globalTeardown: require.resolve('./test-db-utils/globalTeardown.js'),
-
-  webServer: {
-    command: 'npm run ui-test',
-    url: 'http://localhost:6060',
-    reuseExistingServer: !process.env.CI,
-  },
 });
