@@ -11,7 +11,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "sonarqube": "sonarqube-scanner",
     "test": "cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test-server": "cross-env NODE_ENV=test nodemon server.js",
+    "test-server": "cross-env NODE_ENV=ui-test nodemon server.js",
     "ui-test": "concurrently \"npm run test-server\" \"npm run client\""
   },
   "keywords": [],
