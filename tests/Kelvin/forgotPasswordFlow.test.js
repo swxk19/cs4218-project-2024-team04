@@ -1,0 +1,20 @@
+import { test, expect } from '@playwright/test';
+
+// test is expected to fail as there is no forgot password page
+test('should reset the password successfully', async ({ page }) => {
+  await page.goto('http://localhost:3000/')
+  await page.click('a[href="/login"]')
+
+  await page.click('button:has-text("Forgot Password")');
+
+  await page.fill('#email', 'john@example.com');
+  await page.fill('#answer', 'blue');
+  await page.fill('#newPassword', 'NewPassword123!');
+
+  await page.click('button:has-text("Reset Password")');
+
+  const toastLocator = page.locator('[role="status"]');
+  await expect(toastLocator).toContainText('Password Reset Successfully');
+
+  await expect(page).toHaveURL(/\/login$/);
+})
