@@ -1,17 +1,7 @@
 const categories = [
-  {
-    name: 'Electronics',
-    description: 'Electronic gadgets and devices',
-  },
-  {
-    name: 'Clothing',
-    description: 'Apparel and clothing items',
-  },
-  {
-    name: 'Books',
-    description: 'Books and educational materials',
-  },
-  // Add other categories if needed
+  { name: 'Electronics', slug: 'electronics' },
+  { name: 'Clothing', slug: 'clothing' },
+  { name: 'Books', slug: 'books' },
 ];
 
 export default categories;

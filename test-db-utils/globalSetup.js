@@ -1,76 +1,110 @@
-// tests/globalSetup.js
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-// Load environment variables from .env.ui-test
-dotenv.config({ path: '.env.ui-test' });
-
-// Import models
-import User from '../models/userModel.js';
+import Category from '../models/categoryModel.js';
 import Product from '../models/productModel.js';
 import Order from '../models/orderModel.js';
-import Category from '../models/categoryModel.js';
+import User from '../models/userModel.js';
 
 // Import sample data
-import users from '../test-db-utils/sample-data/sampleUsers.js';
-import products from '../test-db-utils/sample-data/sampleProducts.js';
-import categories from '../test-db-utils/sample-data/sampleCategories.js';
-import orders from '../test-db-utils/sample-data/sampleOrders.js';
+import categories from './sample-data/sampleCategories.js';
+import products from './sample-data/sampleProducts.js';
+import users from './sample-data/sampleUsers.js';
+import orders from './sample-data/sampleOrders.js';
 
-const globalSetup = async () => {
-  // Connect to the database without deprecated options
-  await mongoose.connect(process.env.MONGO_TEST_URL);
-
-  // Clear existing data
-  await User.deleteMany({});
-  await Product.deleteMany({});
-  await Category.deleteMany({});
-  await Order.deleteMany({});
-
-  // Insert categories and create a mapping of category names to their ObjectIds
-  const insertedCategories = await Category.insertMany(categories);
-  const categoryMap = insertedCategories.reduce((acc, category) => {
-    acc[category.name] = category._id;
-    return acc;
-  }, {});
-
-  // Insert users
-  const insertedUsers = await User.insertMany(users);
-
-  // Update products with ObjectId references for categories, and log any missing categories
-  const updatedProducts = products.map(product => {
-    const categoryId = categoryMap[product.category];
-    if (!categoryId) {
-      console.warn(`Category "${product.category}" not found in categories. Make sure it exists in sampleCategories.js.`);
+// Function to download images
+async function downloadImage(url) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to download image. Status: ${response.status}`);
     }
+
+    const contentType = response.headers.get('content-type');
+    const data = await response.arrayBuffer();
+
     return {
-      ...product,
-      category: categoryId, // Convert category name to ObjectId (or undefined if not found)
+      data: Buffer.from(data),
+      contentType: contentType,
     };
-  });
+  } catch (error) {
+    console.error(`Error downloading image from ${url}:`, error);
+    return null;
+  }
+}
 
-  // Insert updated products, filter out any products with missing categories
-  const insertedProducts = await Product.insertMany(updatedProducts.filter(product => product.category));
+// Global setup function for Playwright
+export default async function globalSetup() {
+  try {
+    // Connect to the database
+    await mongoose.connect(process.env.MONGO_TEST_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-  // Update orders with references to user IDs and product IDs if needed
-  const userMap = insertedUsers.reduce((acc, user) => {
-    acc[user.email] = user._id;
-    return acc;
-  }, {});
+    // Clear existing data
+    await Category.deleteMany({});
+    await Product.deleteMany({});
+    await User.deleteMany({});
+    await Order.deleteMany({});
 
-  const updatedOrders = orders.map(order => ({
-    ...order,
-    buyer: userMap[order.buyerEmail], // Map buyerEmail to user ID
-    products: insertedProducts.slice(0, 2).map(product => product._id), // Use first 2 products for each order
-  }));
+    // Populate categories
+    const createdCategories = await Category.insertMany(categories);
+    console.log('Categories created:', createdCategories);
 
-  // Insert updated orders
-  await Order.insertMany(updatedOrders);
+    // Create a map of category names to their IDs
+    const categoryMap = new Map(createdCategories.map(cat => [cat.name, cat._id]));
 
-  console.log('Database populated with sample data for tests');
+    // Populate users
+    const createdUsers = await User.insertMany(users);
+    console.log('Users created:', createdUsers);
 
-  // Disconnect from the database
-  await mongoose.disconnect();
-};
+    // Create a map of user emails to their IDs for easy reference
+    const userMap = new Map(createdUsers.map(user => [user.email, user._id]));
 
-export default globalSetup;
+    // Populate products with downloaded images
+    const createdProducts = await Promise.all(products.map(async (product) => {
+      const categoryId = categoryMap.get(product.category);
+      if (!categoryId) {
+        throw new Error(`Category not found for product: ${product.name}`);
+      }
+
+      const photo = await downloadImage(product.imageUrl);
+
+      const newProduct = new Product({
+        ...product,
+        category: categoryId,
+        photo: photo || { data: Buffer.alloc(0), contentType: 'image/jpeg' },
+      });
+      return await newProduct.save();
+    }));
+
+    // Create a map of product names to their IDs for easy order referencing
+    const productMap = new Map(createdProducts.map(prod => [prod.name, prod._id]));
+
+    // Populate orders
+    const populatedOrders = await Promise.all(orders.map(async (order) => {
+      const buyerId = userMap.get(order.buyerEmail); // Use buyer email to match user
+      if (!buyerId) {
+        throw new Error(`Buyer not found for order with transaction ID: ${order.payment.transactionId}`);
+      }
+
+      const productIds = order.productNames.map(name => productMap.get(name)).filter(id => id);
+      if (productIds.length !== order.productNames.length) {
+        throw new Error(`Some products not found for order with transaction ID: ${order.payment.transactionId}`);
+      }
+
+      const newOrder = new Order({
+        ...order,
+        buyer: buyerId,
+        products: productIds,
+      });
+      return await newOrder.save();
+    }));
+
+
+    console.log('Database population completed successfully.');
+  } catch (error) {
+    console.error('Error during global setup:', error);
+  } finally {
+    mongoose.disconnect(); // Leave the database connection open for tests
+  }
+}
