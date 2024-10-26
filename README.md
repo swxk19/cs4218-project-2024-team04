@@ -19,6 +19,21 @@ In the repository of your team, tag the submitted commit with a tag name â€œms1â
 2. Push the created tag into the repository, e.g., git push origin ms1
 3. More details are in: http://git-scm.com/book/en/v2/Git-Basics-Tagging
 
+
+
+# Milestone 2 - How to run tests
+1. Download our env files from [here]([url](https://drive.google.com/drive/folders/1X1ibo3JVlgANbw4X6V6zR-BPW2oAaF6p?usp=drive_link))
+2. Move the 3 env files to the project root
+3. Run 'npm install'
+   
+## Running UI tests
+1. Ensure current directory is at project root
+3. Run 'npm run ui-test' to initialize tests
+4. Run 'npx playwright test --config=playwright.config.cjs'
+
+## Running integration tests
+1. Run 'npm run test'
+   
 # Milestone 2 Contributions
 ## Integration Tests 
 ### Kelvin Seow (A0234975R)
