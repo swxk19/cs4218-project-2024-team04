@@ -41,8 +41,4 @@ module.exports = defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
-
-  /* Global setup and teardown */
-  globalSetup: require.resolve('./test-db-utils/globalSetup.js'),
-  globalTeardown: require.resolve('./test-db-utils/globalTeardown.js'),
 });
