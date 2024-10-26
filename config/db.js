@@ -10,6 +10,9 @@ const connectDB = async () => {
       } else if (process.env.NODE_ENV === "test") {
         dotenv.config({ path: "./.env.test" });
         mongoUrl = process.env.MONGO_TEST_URL
+      } else if (process.env.NODE_ENV === "ui-test"){
+        dotenv.config({ path: "./.env.ui-test" });
+        mongoUrl = process.env.MONGO_TEST_URL
       } else {
         dotenv.config({ path: "./.env" });
         mongoUrl = process.env.MONGO_URL
