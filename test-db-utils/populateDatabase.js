@@ -3,6 +3,7 @@ import Category from '../models/categoryModel.js';
 import Product from '../models/productModel.js';
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
+import { hashPassword } from '../helpers/authHelper.js'; // Import the hashPassword function
 
 // Import sample data
 import categories from './sample-data/sampleCategories.js';
@@ -31,8 +32,8 @@ async function downloadImage(url) {
   }
 }
 
-// Global setup function for Playwright
-export default async function globalSetup() {
+// Function to populate the database
+export const populateDatabase = async () => {
   try {
     // Connect to the database
     await mongoose.connect(process.env.MONGO_TEST_URL, {
@@ -48,16 +49,18 @@ export default async function globalSetup() {
 
     // Populate categories
     const createdCategories = await Category.insertMany(categories);
-    console.log('Categories created:', createdCategories);
-
-    // Create a map of category names to their IDs
     const categoryMap = new Map(createdCategories.map(cat => [cat.name, cat._id]));
 
-    // Populate users
-    const createdUsers = await User.insertMany(users);
-    console.log('Users created:', createdUsers);
+    // Hash passwords and populate users
+    const usersWithHashedPasswords = await Promise.all(users.map(async (user) => {
+      const hashedPassword = await hashPassword(user.password);
+      return {
+        ...user,
+        password: hashedPassword, // Replace plain password with hashed password
+      };
+    }));
 
-    // Create a map of user emails to their IDs for easy reference
+    const createdUsers = await User.insertMany(usersWithHashedPasswords);
     const userMap = new Map(createdUsers.map(user => [user.email, user._id]));
 
     // Populate products with downloaded images
@@ -68,7 +71,6 @@ export default async function globalSetup() {
       }
 
       const photo = await downloadImage(product.imageUrl);
-
       const newProduct = new Product({
         ...product,
         category: categoryId,
@@ -77,14 +79,13 @@ export default async function globalSetup() {
       return await newProduct.save();
     }));
 
-    // Create a map of product names to their IDs for easy order referencing
     const productMap = new Map(createdProducts.map(prod => [prod.name, prod._id]));
 
     // Populate orders
-    const populatedOrders = await Promise.all(orders.map(async (order) => {
-      const buyerId = userMap.get(order.buyerEmail); // Use buyer email to match user
+    await Promise.all(orders.map(async (order) => {
+      const buyerId = userMap.get(order.buyerEmail);
       if (!buyerId) {
-        throw new Error(`Buyer not found for order with transaction ID: ${order.payment.transactionId}`);
+        throw new Error(`Buyer not found for email: ${order.buyerEmail} (Transaction ID: ${order.payment.transactionId})`);
       }
 
       const productIds = order.productNames.map(name => productMap.get(name)).filter(id => id);
@@ -100,11 +101,10 @@ export default async function globalSetup() {
       return await newOrder.save();
     }));
 
-
     console.log('Database population completed successfully.');
   } catch (error) {
-    console.error('Error during global setup:', error);
+    console.error('Error during database population:', error);
   } finally {
-    mongoose.disconnect(); // Leave the database connection open for tests
+    await mongoose.disconnect(); // Ensure the database connection is closed
   }
-}
+};
