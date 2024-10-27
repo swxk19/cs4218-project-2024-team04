@@ -10,27 +10,36 @@ test.afterEach(async () => {
     await cleanupDatabase()
 })
 
-test('should log in an existing user successfully and view dashboard', async ({ page }) => {
+test('should log in via cart page', async ({ page }) => {
     await page.goto('http://localhost:3000/')
-    await page.click('a[href="/login"]')
-    await page.fill('#exampleInputEmail1', 'john@example.com')
-    await page.fill('#exampleInputPassword1', 'hashedpassword123')
+    await page.click('a[href="/cart"]')
 
+    // Verify the URL is for the cart page
+    await expect(page).toHaveURL(/\/cart/)
+
+    // Click on "Please Login to checkout" button
+    await page.click('button:has-text("Plase Login to checkout")')
+
+    // Verify that the URL is the login page
+    await expect(page).toHaveURL(/\/login/)
+
+    // Fill in login details
+    await page.fill('#exampleInputEmail1', 'jane@example.com') 
+    await page.fill('#exampleInputPassword1', 'hashedpassword456') 
+
+    // Submit the login form
     await page.click('button:has-text("Login")')
 
-    const toastLocator = page.locator('[role="status"]');
-    await expect(toastLocator).toContainText('login successfully');
+    // Check for success toast message
+    const toastLocator = page.locator('[role="status"]')
+    await expect(toastLocator).toContainText('login successfully')
 
-    await expect(page).toHaveURL(/^\w+:\/\/[^\/]+\/$/)
-    await page.click(`nav .nav-link.dropdown-toggle:has-text("John Doe")`)
-    await page.click('a.dropdown-item:has-text("Dashboard")')
-    await expect(page).toHaveURL(/\/dashboard\/.*/)
+    // Verify redirection back to the cart page
+    await expect(page).toHaveURL(/\/cart/)
 
-    const nameLocator = page.locator('h3').nth(0)
-    const emailLocator = page.locator('h3').nth(1)
-    const addressLocator = page.locator('h3').nth(2)
+    await expect(page.locator('h1')).toContainText('Hello  Jane Smith')
 
-    await expect(nameLocator).toHaveText('John Doe')
-    await expect(emailLocator).toHaveText('john@example.com')
-    await expect(addressLocator).toHaveText('123 Main St, Sample City, Sample State, 12345, Sample Country')
+    await page.click(`nav .nav-link.dropdown-toggle:has-text("Jane Smith")`)
+    await page.click('a.dropdown-item:has-text("Logout")')
+    await expect(page).toHaveURL(/\/login/)
 })
