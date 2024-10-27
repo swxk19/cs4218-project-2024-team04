@@ -70,7 +70,7 @@ test('should be able to view similar products when viewing the product details p
     // Navigate into the product details page of the desired item.
     // WARNING: this step fails clicking More Details button from the search page does not work 🤡. This is a workaround to get the code working for now.
     // await page.getByRole('button', { name: "More Details" }).click();
-    await page.goto(websiteUrl + "product/Jeans", { waitUntil: "domcontentloaded" });
+    await page.goto(websiteUrl + "product/jeans", { waitUntil: "domcontentloaded" });
 
     // Verify that similar items are shown in the product details page and that similar items are correct.
     await expect(page.getByRole('heading', { name: TSHIRT_PRODUCT_OBJECT.name })).toBeVisible();

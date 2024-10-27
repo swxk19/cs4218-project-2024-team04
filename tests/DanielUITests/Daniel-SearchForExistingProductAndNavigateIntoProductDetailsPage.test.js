@@ -53,7 +53,7 @@ test('should be able to search for a product and then navigate into the product 
     // Navigate into the product details page of the desired item.
     // WARNING: this step fails clicking More Details button from the search page does not work 🤡. This is a workaround to get the code working for now.
     // await page.getByRole('button', { name: "More Details" }).click();
-    await page.goto(websiteUrl + "product/Jeans", { waitUntil: "domcontentloaded" });
+    await page.goto(websiteUrl + "product/jeans", { waitUntil: "domcontentloaded" });
 
     // Verify that the details of the desired product are displayed correctly on the Product Details Page.
     await expect(page.getByText("Name : " + JEANS_PRODUCT_OBJECT.name)).toBeVisible();
