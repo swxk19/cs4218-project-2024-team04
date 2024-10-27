@@ -31,6 +31,10 @@
 - <root>/integration-tests/HomePageIntegration.test.js
 - <root>/integration-tests/CategoriesIntegration.test.js
 
+### Daniel Lim (A0233730N)
+
+- <root>/integration-tests/SearchProductDetails.test.js
+
 ## UI Tests
 
 ### Kelvin Seow (A0234975R)
@@ -40,5 +44,9 @@
 ### Chung Yunseong (A0219791U)
 
 - <root>/tests/YunseongUiTests/HomePageCartPageCategories.spec.js
+
+### Daniel Lim (A0233730N)
+
+- <root>/tests/DanielUITests/*
 
 SonarQube generation - Kelvin Seow
