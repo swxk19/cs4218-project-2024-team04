@@ -35,7 +35,7 @@
 
 ### Kelvin Seow (A0234975R)
 
-- <root>/tests/Kelvin/\*
+- <root>/tests/Kelvin/*
 
 ### Chung Yunseong (A0219791U)
 
