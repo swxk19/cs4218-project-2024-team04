@@ -4,7 +4,7 @@ import Product from '../models/productModel.js';
 import User from '../models/userModel.js';
 import categories from './sample-data/sampleCategories.js';
 import products from './sample-data/sampleProducts.js';
-import { getHashedUsers } from './sample-data/sampleUsers.js'; // Import the function to get hashed users
+import { getSampleUsers } from './sample-data/sampleUsers.js';
 
 async function downloadImage(url) {
   try {
@@ -40,7 +40,7 @@ export const populateDatabase = async () => {
     const createdCategories = await Category.insertMany(categories);
     const categoryMap = new Map(createdCategories.map(cat => [cat.name, cat._id]));
 
-    const createdUsers = await getHashedUsers(); 
+    const [createdUsers] = await getSampleUsers(); 
     await User.insertMany(createdUsers); 
 
     const createdProducts = await Promise.all(products.map(async (product) => {

@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
 import supertest from 'supertest'
 import app from '../server.js' // Import the Express app from server.js
-import { getHashedUsers } from '../test-db-utils/sample-data/sampleUsers.js';
+import { getSampleUsers } from '../test-db-utils/sample-data/sampleUsers.js';
 import User from '../models/userModel.js' // Import the User model
 
 // Setup and teardown for the database
 beforeAll(async () => {
-  const createdUsers = await getHashedUsers();
+  const [createdUsers] = await getSampleUsers();
   await mongoose.connection.db.collection('users').deleteMany({})
   await User.insertMany(createdUsers) // populate sample data
 })
