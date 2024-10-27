@@ -98,6 +98,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await mongoose.connection.db.collection("categories").deleteMany({});
   await mongoose.connection.db.collection("products").deleteMany({});
+  await mongoose.connection.close();
 });
 
 describe("Categories integration test", () => {
