@@ -1,3 +1,5 @@
+import { hashPassword } from '../../helpers/authHelper.js';
+
 const users = [
   {
     name: 'John Doe',
@@ -55,4 +57,16 @@ const users = [
   },
 ];
 
-export default users;
+const hashUserPasswords = async (userList) => {
+  return Promise.all(userList.map(async (user) => {
+    const hashedPassword = await hashPassword(user.password);
+    return {
+      ...user,
+      password: hashedPassword,
+    };
+  }));
+};
+
+export const getHashedUsers = async () => {
+  return await hashUserPasswords(users);
+};
