@@ -10,7 +10,7 @@ test.afterEach(async () => {
     await cleanupDatabase()
 })
 
-test('should log in via cart page', async ({ page }) => {
+test('log in via cart page, view cart, then log out', async ({ page }) => {
     await page.goto('http://localhost:3000/')
     await page.click('a[href="/cart"]')
 

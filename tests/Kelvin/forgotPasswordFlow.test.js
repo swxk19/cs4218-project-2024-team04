@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 // test is expected to fail as there is no forgot password page
-test('user resets the password', async ({ page }) => {
+test('user forgets password, resets it, then logs in', async ({ page }) => {
   await page.goto('http://localhost:3000/')
   await page.click('a[href="/login"]')
 
