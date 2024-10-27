@@ -2,13 +2,9 @@ import mongoose from 'mongoose';
 import Category from '../models/categoryModel.js';
 import Product from '../models/productModel.js';
 import User from '../models/userModel.js';
-import Order from '../models/orderModel.js';
-import { hashPassword } from '../helpers/authHelper.js';
-
 import categories from './sample-data/sampleCategories.js';
 import products from './sample-data/sampleProducts.js';
-import users from './sample-data/sampleUsers.js';
-import orders from './sample-data/sampleOrders.js';
+import { getHashedUsers } from './sample-data/sampleUsers.js'; // Import the function to get hashed users
 
 async function downloadImage(url) {
   try {
@@ -40,21 +36,12 @@ export const populateDatabase = async () => {
     await Category.deleteMany({});
     await Product.deleteMany({});
     await User.deleteMany({});
-    await Order.deleteMany({});
 
     const createdCategories = await Category.insertMany(categories);
     const categoryMap = new Map(createdCategories.map(cat => [cat.name, cat._id]));
 
-    const usersWithHashedPasswords = await Promise.all(users.map(async (user) => {
-      const hashedPassword = await hashPassword(user.password);
-      return {
-        ...user,
-        password: hashedPassword,
-      };
-    }));
-
-    const createdUsers = await User.insertMany(usersWithHashedPasswords);
-    const userMap = new Map(createdUsers.map(user => [user.email, user._id]));
+    const createdUsers = await getHashedUsers(); 
+    await User.insertMany(createdUsers); 
 
     const createdProducts = await Promise.all(products.map(async (product) => {
       const categoryId = categoryMap.get(product.category);
