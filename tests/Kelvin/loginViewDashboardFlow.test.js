@@ -24,8 +24,8 @@ test('should log in via cart page', async ({ page }) => {
     await expect(page).toHaveURL(/\/login/)
 
     // Fill in login details
-    await page.fill('#exampleInputEmail1', 'jane@example.com') // Provide the correct email
-    await page.fill('#exampleInputPassword1', 'hashedpassword456') // Provide the correct password
+    await page.fill('#exampleInputEmail1', 'jane@example.com') 
+    await page.fill('#exampleInputPassword1', 'hashedpassword456') 
 
     // Submit the login form
     await page.click('button:has-text("Login")')
