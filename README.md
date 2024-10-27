@@ -23,30 +23,30 @@
 
 ### Kelvin Seow (A0234975R)
 
-- <root>/integration-tests/authIntegration.test.js
+- /integration-tests/authIntegration.test.js
 
 ### Chung Yunseong (A0219791U)
 
-- <root>/integration-tests/CartPageIntegration.test.js
-- <root>/integration-tests/HomePageIntegration.test.js
-- <root>/integration-tests/CategoriesIntegration.test.js
+- /integration-tests/CartPageIntegration.test.js
+- /integration-tests/HomePageIntegration.test.js
+- /integration-tests/CategoriesIntegration.test.js
 
 ### Daniel Lim (A0233730N)
 
-- <root>/integration-tests/SearchProductDetails.test.js
+- /integration-tests/SearchProductDetails.test.js
 
 ## UI Tests
 
 ### Kelvin Seow (A0234975R)
 
-- <root>/tests/Kelvin/*
+- /tests/Kelvin/*
 
 ### Chung Yunseong (A0219791U)
 
-- <root>/tests/YunseongUiTests/HomePageCartPageCategories.spec.js
+- /tests/YunseongUiTests/HomePageCartPageCategories.spec.js
 
 ### Daniel Lim (A0233730N)
 
-- <root>/tests/DanielUITests/*
+- /tests/DanielUITests/*
 
 SonarQube generation - Kelvin Seow
