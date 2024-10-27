@@ -22,3 +22,5 @@
 ## UI Tests
 ### Kelvin Seow (A0234975R)
 - <root>/tests/Kelvin/*
+
+SonarQube generation - Kelvin Seow
