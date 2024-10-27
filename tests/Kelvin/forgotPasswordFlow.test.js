@@ -17,9 +17,4 @@ test('user resets the password', async ({ page }) => {
   await expect(toastLocator).toContainText('Password Reset Successfully');
 
   await expect(page).toHaveURL(/\/login$/);
-
-  await page.fill('#exampleInputEmail1', 'john@example.com') 
-  await page.fill('#exampleInputPassword1', 'NewPassword123!') 
-
-  await page.click('button:has-text("Login")')
 })
