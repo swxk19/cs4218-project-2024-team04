@@ -70,7 +70,7 @@ test('should be able to view similar products when viewing the product details p
     await expect(page.getByRole('button', { name: "More Details" }).first()).toBeVisible();
     
     // Navigate into product details page of the similar item.
-    await page.getByRole('button', { name: "More Details" }).click();
+    await page.getByRole('button', { name: "More Details" }).first().click();
 
     // Verify that the details of the similar product are displayed correctly on the Product Details Page.
     await expect(page.getByText("Name : " + TSHIRT_PRODUCT_OBJECT.name)).toBeVisible();

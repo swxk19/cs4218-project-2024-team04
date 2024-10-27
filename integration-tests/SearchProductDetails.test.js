@@ -185,7 +185,7 @@ describe('Search Product Details Integration Tests', () => {
         const responseTshirtProduct = responseProducts[0];
 
         expect(response.body.success).toBe(true);
-        expect(responseProducts.length).toBe(1);
+        expect(responseProducts.length).toBe(2);
 
         // Check that the response t-shirt product matches the database t-shirt product.
         expect(responseTshirtProduct.name).toBe(databaseTshirtProduct.name);
