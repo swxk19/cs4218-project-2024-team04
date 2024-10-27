@@ -39,6 +39,12 @@
 
 - /integration-tests/categoryCRUDIntegration.test.js
 
+### Caden Cheong Jun Kai (A0231110J)
+
+- /integration-tests/adminOrdersIntegration.test.js
+- /integration-tests/ordersIntegration.test.js
+- /integration-tests/profileIntegration.test.js
+
 ## UI Tests
 
 ### Kelvin Seow (A0234975R)
@@ -56,5 +62,9 @@
 ### Tan Zong Zhi, Shaun (A0235143N)
 
 - /tests/Shaun/*
+
+### Caden Cheong Jun Kai (A0231110J)
+
+- /tests/Caden/*
 
 SonarQube generation - Kelvin Seow
