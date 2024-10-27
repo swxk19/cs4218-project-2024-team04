@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { populateDatabase } from '../../test-db-utils/populateDatabase.js';
+import { cleanupDatabase } from '../../test-db-utils/cleanupDatabase.js';
 
 const websiteUrl = 'http://localhost:3000/';
 const userEmail = 'Daniel@gmail.com';
@@ -37,6 +39,14 @@ const TSHIRT_PRODUCT_OBJECT = {
     slug: "t-shirt",
     updatedAt: "2024-09-06T17:57:19.984Z"
 };
+
+test.beforeEach(async () => {
+    await populateDatabase();
+});
+
+test.afterEach(async () => {
+    await cleanupDatabase();
+});
 
 test('should be able to view similar products when viewing the product details page and navigate to the product details page of the similar products', async ({ page }) => {
     // Visit ecommerce website.

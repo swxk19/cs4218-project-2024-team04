@@ -1,10 +1,20 @@
 import { test, expect } from '@playwright/test';
+import { populateDatabase } from '../../test-db-utils/populateDatabase.js';
+import { cleanupDatabase } from '../../test-db-utils/cleanupDatabase.js';
 
 const websiteUrl = 'http://localhost:3000/';
 const userEmail = 'Daniel@gmail.com';
 const userPassword = 'Daniel';
 const searchItem = 'this is not a real object';
 const noSearchResultsMessage = "No Products Found";
+
+test.beforeEach(async () => {
+    await populateDatabase();
+});
+
+test.afterEach(async () => {
+    await cleanupDatabase();
+});
 
 test('should be able to search for a non-existent product and be shown an error message indicating that there are no matching products', async ({ page }) => {
     // Visit ecommerce website.

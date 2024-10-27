@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { populateDatabase } from '../../test-db-utils/populateDatabase.js';
+import { cleanupDatabase } from '../../test-db-utils/cleanupDatabase.js';
 
 const websiteUrl = 'http://localhost:3000/';
 const userEmail = 'Daniel@gmail.com';
@@ -20,6 +22,14 @@ const JEANS_PRODUCT_OBJECT = {
     slug: "jeans",
     updatedAt: "2024-09-06T17:57:20.029Z"
 };
+
+test.beforeEach(async () => {
+    await populateDatabase();
+});
+
+test.afterEach(async () => {
+    // await cleanupDatabase();
+});
 
 test('should be able to search for a product and then navigate into the product details page of the product', async ({ page }) => {
     // Visit ecommerce website.
