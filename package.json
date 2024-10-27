@@ -59,7 +59,8 @@
     "maxWorkers": 1,
     "testPathIgnorePatterns": [
       "/_site",
-      "/tests-examples"
+      "/tests-examples",
+      "/tests"
     ],
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
@@ -69,6 +70,12 @@
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!(styleMock\\.js)$)"
-    ]
+    ],
+    "collectCoverage": true,
+    "coverageReporters": [
+      "lcov",
+      "text"
+    ],
+    "coverageDirectory": "coverage"
   }
 }
