@@ -1,13 +1,14 @@
 import mongoose from 'mongoose'
 import supertest from 'supertest'
 import app from '../server.js' // Import the Express app from server.js
-import users from '../test-db-utils/sample-data/sampleUsers.js'
+import { getHashedUsers } from '../test-db-utils/sample-data/sampleUsers.js';
 import User from '../models/userModel.js' // Import the User model
 
 // Setup and teardown for the database
 beforeAll(async () => {
+  const createdUsers = await getHashedUsers();
   await mongoose.connection.db.collection('users').deleteMany({})
-  await User.insertMany(users) // populate sample data
+  await User.insertMany(createdUsers) // populate sample data
 })
 
 afterAll(async () => {
@@ -18,7 +19,7 @@ afterAll(async () => {
 
 describe('Auth API and DB Integration', () => {
     describe('auth/login route', () => {
-        it.failing('should login a user successfully if given valid credentials', async () => {
+        it('should login a user successfully if given valid credentials', async () => {
             const loginDetails = {
               email: 'john@example.com',
               password: 'hashedpassword123', // This user already exists when the sample data is loaded
@@ -35,11 +36,7 @@ describe('Auth API and DB Integration', () => {
             expect(response.body.user.email).toBe(loginDetails.email)
             expect(response.body.user.name).toBe('John Doe')
             expect(response.body.user.phone).toBe('1234567890')
-            expect(response.body.user.address.street).toBe('123 Main St')
-            expect(response.body.user.address.city).toBe('Sample City')
-            expect(response.body.user.address.state).toBe('Sample State')
-            expect(response.body.user.address.zip).toBe('12345')
-            expect(response.body.user.address.country).toBe('Sample Country')
+            expect(response.body.user.address).toBe('123 Main St, Sample City, Sample State, 12345, Sample Country')
             expect(response.body.user.role).toBe(0)
             expect(response.body.token).toBeDefined()
           })
