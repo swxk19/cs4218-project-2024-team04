@@ -1,26 +1,72 @@
-const { test, expect } = require("@playwright/test");
+import { test, expect } from "@playwright/test";
+
+import { populateDatabase } from "../../test-db-utils/populateDatabase.js";
+import { cleanupDatabase } from "../../test-db-utils/cleanupDatabase.js";
+
+import products from "../../test-db-utils/sample-data/sampleProducts.js";
+import categories from "../../test-db-utils/sample-data/sampleCategories.js";
+
+import { getSampleUsers } from "../../test-db-utils/sample-data/sampleUsers.js";
+
+test.beforeEach(async () => {
+  await populateDatabase();
+});
+
+test.afterEach(async () => {
+  await cleanupDatabase();
+});
 
 const baseUrl = "http://localhost:3000";
 const pageTitle = "Virtual Vault";
 
-const productNamesInFirstPage = [
+var productNamesInFirstPage = [
   "Jeans",
   "Novel",
-  "1",
-  "T-shirt",
+  "Laptop",
+  "Jacket",
   "Smartphone",
-  "The Law of Contract in Singapore",
+  "Earphone",
 ];
 
-const allProductNames = [...productNamesInFirstPage, "Laptop", "Textbook"];
+productNamesInFirstPage = products
+  .map((product) => product.name)
+  .sort()
+  .slice(0, 6);
 
-const electronicsNames = ["Laptop", "Smartphone", "1"];
+var allProductNames = [...productNamesInFirstPage, "T-shirt", "Textbook"];
 
-const bookNames = ["Novel", "Textbook", "The Law of Contract in Singapore"];
+allProductNames = products.map((product) => product.name);
 
-const clothingNames = ["Jeans", "T-shirt"];
+var electronicsNames = ["Laptop", "Smartphone", "Earphone"];
 
-const categoryNames = ["Electronics", "Book", "Clothing"];
+electronicsNames = products
+  .filter((product) => product.category === "Electronics")
+  .map((product) => product.name);
+
+var bookNames = ["Novel", "Textbook"];
+
+bookNames = products
+  .filter((product) => product.category === "Books")
+  .map((product) => product.name);
+
+var clothingNames = ["Jeans", "T-shirt", "Jacket"];
+
+clothingNames = products
+  .filter((product) => product.category === "Clothing")
+  .map((product) => product.name);
+
+var categoryNames = ["Electronics", "Books", "Clothing"];
+
+categoryNames = categories.map((category) => category.name);
+
+async function fetchUser() {
+  const users = await getSampleUsers();
+  const nonAdminUser = users[0].find((user) => user.role === 0);
+  const email = nonAdminUser.email;
+  const password = users[1][email];
+  const name = nonAdminUser.name;
+  return { email, password, name };
+}
 
 test("User should be able to navigate to home page, apply filters and view filtered products, navigate to individual categories page, then navigate back to home page", async ({
   page,
@@ -28,6 +74,9 @@ test("User should be able to navigate to home page, apply filters and view filte
   await page.goto(baseUrl);
 
   await expect(page.getByText(pageTitle)).toBeVisible();
+
+  console.log(productNamesInFirstPage);
+  console.log(allProductNames.sort());
 
   // Check if all products in first page is visible
 
@@ -118,7 +167,7 @@ test("User should be able to navigate to home page, apply filters and view filte
     switch (category) {
       case "Electronics":
         products = electronicsNames;
-      case "Book":
+      case "Books":
         products = bookNames;
       case "Clothing":
         products = clothingNames;
@@ -160,6 +209,10 @@ test("User should be able to navigate to home page, apply filters and view filte
 test("User should be able to access all buttons in navigation bar, and content of navigation bar should be rendered differently according to login status", async ({
   page,
 }) => {
+  const user = await fetchUser();
+  const email = user.email;
+  const password = user.password;
+  const name = user.name;
   await page.goto(baseUrl);
 
   await expect(page.getByRole("link", { name: "Categories" })).toBeVisible();
@@ -207,9 +260,9 @@ test("User should be able to access all buttons in navigation bar, and content o
 
   await page.getByRole("link", { name: "Login" }).click();
 
-  await page.getByPlaceholder("Enter Your Email ").fill("asdf@gmail.com");
+  await page.getByPlaceholder("Enter Your Email ").fill(email);
   await page.getByPlaceholder("Enter Your Password").click();
-  await page.getByPlaceholder("Enter Your Password").fill("asdf");
+  await page.getByPlaceholder("Enter Your Password").fill(password);
   await page.getByRole("button", { name: "LOGIN" }).click();
 
   await expect(page.getByRole("link", { name: "Categories" })).toBeVisible();
@@ -218,13 +271,18 @@ test("User should be able to access all buttons in navigation bar, and content o
   await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Register" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Login" })).not.toBeVisible();
-  await expect(page.getByRole("button", { name: "asdf" })).toBeVisible();
+  await expect(page.getByRole("button", { name: name })).toBeVisible();
   await expect(page.getByRole("link", { name: "Cart" })).toBeVisible();
 });
 
 test("User should be able to view product details, add/remove product to/from cart, and login to proceed to checkout", async ({
   page,
 }) => {
+  const user = await fetchUser();
+  const email = user.email;
+  const password = user.password;
+  const name = user.name;
+
   await page.goto(baseUrl);
 
   await page.locator(".card-name-price > button").first().click();
@@ -248,26 +306,30 @@ test("User should be able to view product details, add/remove product to/from ca
   ).toBeVisible();
 
   await expect(
-    page.getByText("The Law of Contract in Singapore")
+    page.getByText(productNamesInFirstPage[0], { exact: true })
   ).toBeVisible();
 
-  await expect(page.getByText("Jeans", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(productNamesInFirstPage[2], { exact: true })
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Remove" }).first().click();
 
   await expect(
-    page.getByText("The Law of Contract in Singapore")
+    page.getByText(productNamesInFirstPage[0], { exact: true })
   ).not.toBeVisible();
 
-  await expect(page.getByText("Jeans", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(productNamesInFirstPage[2], { exact: true })
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Plase Login to checkout" }).click();
 
   await expect(page.getByRole("heading", { name: "LOGIN FORM" })).toBeVisible();
 
-  await page.getByPlaceholder("Enter Your Email ").fill("asdf@gmail.com");
+  await page.getByPlaceholder("Enter Your Email ").fill(email);
   await page.getByPlaceholder("Enter Your Password").click();
-  await page.getByPlaceholder("Enter Your Password").fill("asdf");
+  await page.getByPlaceholder("Enter Your Password").fill(password);
   await page.getByRole("button", { name: "LOGIN" }).click();
 
   await page.getByRole("link", { name: "Cart" }).click();
