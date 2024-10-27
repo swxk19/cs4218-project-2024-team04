@@ -35,6 +35,10 @@
 
 - /integration-tests/SearchProductDetails.test.js
 
+### Tan Zong Zhi, Shaun (A0235143N)
+
+- /integration-tests/categoryCRUDIntegration.test.js
+
 ## UI Tests
 
 ### Kelvin Seow (A0234975R)
@@ -48,5 +52,9 @@
 ### Daniel Lim (A0233730N)
 
 - /tests/DanielUITests/*
+
+### Tan Zong Zhi, Shaun (A0235143N)
+
+- /tests/Shaun/*
 
 SonarQube generation - Kelvin Seow
