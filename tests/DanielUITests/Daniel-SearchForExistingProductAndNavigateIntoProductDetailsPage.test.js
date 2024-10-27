@@ -28,7 +28,7 @@ test.beforeEach(async () => {
 });
 
 test.afterEach(async () => {
-    // await cleanupDatabase();
+    await cleanupDatabase();
 });
 
 test('should be able to search for a product and then navigate into the product details page of the product', async ({ page }) => {
