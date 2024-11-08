@@ -1,0 +1,7 @@
+Performance test for response time for 1000 users (over 3 sec ramp up) visiting the homepage.
+
+Summary:
+Avg - 69ms
+Min - 2ms
+Max - 150ms
+S.D. - 56.66
