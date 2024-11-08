@@ -68,3 +68,11 @@
 - /tests/Caden/*
 
 SonarQube generation - Kelvin Seow
+
+# Milestone 3 Contributions
+
+## JMeter Tests
+
+### Seow Wen Xuan, Kelvin (A0234975R)
+
+- /jmeter-tests/Kelvin/*
