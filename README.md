@@ -49,7 +49,7 @@
 
 ### Kelvin Seow (A0234975R)
 
-- /tests/Kelvin/*
+- /tests/Kelvin/\*
 
 ### Chung Yunseong (A0219791U)
 
@@ -57,15 +57,15 @@
 
 ### Daniel Lim (A0233730N)
 
-- /tests/DanielUITests/*
+- /tests/DanielUITests/\*
 
 ### Tan Zong Zhi, Shaun (A0235143N)
 
-- /tests/Shaun/*
+- /tests/Shaun/\*
 
 ### Caden Cheong Jun Kai (A0231110J)
 
-- /tests/Caden/*
+- /tests/Caden/\*
 
 SonarQube generation - Kelvin Seow
 
@@ -75,4 +75,5 @@ SonarQube generation - Kelvin Seow
 
 ### Seow Wen Xuan, Kelvin (A0234975R)
 
-- /jmeter-tests/Kelvin/*
+- /jmeter-tests/Kelvin/\*
+- /jmeter-tests/Yunseong/\*
