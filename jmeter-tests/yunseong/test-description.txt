@@ -1,0 +1,5 @@
+Endurance test for fetching payment tokens and fetching filtered products
+
+Number of threads used: 100
+Test duration: 10 minutes
+Tested endpoints: /api/v1/product/product-category/electronics, /api/v1/product/braintree/token
