@@ -76,4 +76,7 @@ SonarQube generation - Kelvin Seow
 ### Seow Wen Xuan, Kelvin (A0234975R)
 
 - /jmeter-tests/Kelvin/\*
-- /jmeter-tests/Yunseong/\*
+
+### Chung Yunseong (A0219791U)
+
+- /jmeter-tests/yunseong/\*
