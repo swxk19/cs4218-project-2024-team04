@@ -80,3 +80,7 @@ SonarQube generation - Kelvin Seow
 ### Chung Yunseong (A0219791U)
 
 - /jmeter-tests/yunseong/\*
+
+### Tan Zong Zhi, Shaun (A0235143N)
+
+- /jmeter-tests/shaun/\*
