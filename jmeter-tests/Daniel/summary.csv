@@ -1,0 +1,4 @@
+Label,# Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Received KB/sec,Sent KB/sec,Avg. Bytes
+Get All Product Details,100,361,78,1444,299.37,0.000%,24.53988,71.39,3.40,2979.0
+Get Jeans Product Details,100,229,80,1188,239.80,0.000%,24.48580,15.57,3.54,651.0
+TOTAL,200,295,78,1444,279.13,0.000%,47.55112,84.28,6.73,1815.0

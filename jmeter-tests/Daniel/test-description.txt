@@ -1,0 +1,9 @@
+Throughput test for fetching all products for home page and fetching specific products
+
+Number of Threads Used (Users): 100
+Throughput (Get All Product Details): 24.5/sec
+Throughput (Get Jeans Product Details): 24.5/sec
+Throughput (Total): 47.6/sec
+Tested Endpoints:
+* /api/v1/product/get-product
+* /api/v1/product/get-product/:slug
