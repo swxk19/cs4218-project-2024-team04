@@ -84,3 +84,7 @@ SonarQube generation - Kelvin Seow
 ### Tan Zong Zhi, Shaun (A0235143N)
 
 - /jmeter-tests/shaun/\*
+
+### Daniel Lim Wei En (A0233730N)
+
+- /jmeter-tests/Daniel/\*
