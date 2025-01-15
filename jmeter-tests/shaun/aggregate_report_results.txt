@@ -1,0 +1,13 @@
+# Login Request
+Samples: 100
+Average: 68
+Median: 67
+90% Line: 73
+95% Line: 75
+99% Line: 83
+Min: 65
+Maximum: 83
+Error %: 0.00%
+Throughput: 32.9/sec
+Received KB/sec: 22.56
+Sent KB/sec: 8.85

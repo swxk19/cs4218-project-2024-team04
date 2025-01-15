@@ -1,0 +1,53 @@
+[
+  {
+    "Label": "Filtering electronics",
+    "# Samples": 20077,
+    "Average": 1937,
+    "Min": 74,
+    "Max": 10687,
+    "Std. Dev.": 1128.37,
+    "Error %": "0.000%",
+    "Throughput": 27.83169,
+    "Received KB": {
+      "sec": 37397.01
+    },
+    "Sent KB": {
+      "sec": 4.32
+    },
+    "Avg. Bytes": 1375933
+  },
+  {
+    "Label": "Fetching payment tokens",
+    "# Samples": 19982,
+    "Average": 1014,
+    "Min": 74,
+    "Max": 8011,
+    "Std. Dev.": 478.43,
+    "Error %": "0.776%",
+    "Throughput": 27.7576,
+    "Received KB": {
+      "sec": 69.65
+    },
+    "Sent KB": {
+      "sec": 3.96
+    },
+    "Avg. Bytes": 2569.6
+  },
+  {
+    "Label": "TOTAL",
+    "# Samples": 40059,
+    "Average": 1477,
+    "Min": 74,
+    "Max": 10687,
+    "Std. Dev.": 982.41,
+    "Error %": "0.387%",
+    "Throughput": 55.53168,
+    "Received KB": {
+      "sec": 37466.52
+    },
+    "Sent KB": {
+      "sec": 8.27
+    },
+    "Avg. Bytes": 690879.8
+  }
+]
